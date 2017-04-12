@@ -24,6 +24,9 @@ cmd-livedisk-init() {
         die "Keymap could not be set"
     fi
 
+    category "Update the system clock"
+    timedatectl set-ntp true
+
     category "Search for fast mirrors and update repositories"
     if [[ ! -f "/etc/pacman.d/mirrorlist.backup" ]]; then
         mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
