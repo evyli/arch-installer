@@ -18,6 +18,6 @@ INPUT_M4 = $(shell find src/scripts -type f -name '*.sh.in')
 
 .PHONY: all
 all: arch-installer.sh
-archcmd.sh: $(INPUT_M4) src/main.sh
+arch-installer.sh: $(INPUT_M4) src/main.sh
 	m4 -P $^ > $@ || $(RM) $@
 	chmod +x $@
