@@ -40,6 +40,8 @@ cmd-install() {
                           btrfs-progs grub
                           # basic user utils
                           rsync vim git
+                          # network dependencies
+                          iw wpa_supplicant dialog wpa_actiond ifplugd
                           # pacman utils
                           pacman-mirrorlist pkgfile)
     target-install "${base_packages[@]}"
