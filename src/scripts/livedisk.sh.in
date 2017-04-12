@@ -20,7 +20,7 @@ cmd-livedisk-init() {
     config-read
 
     category "Setup keys"
-    if ! loadkeys "$ARCHCMD_KEYMAP"; then
+    if ! loadkeys "$KEYMAP"; then
         die "Keymap could not be set"
     fi
 

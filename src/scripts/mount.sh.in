@@ -22,14 +22,14 @@ cmd-mount() {
 
     if [[ ! -e "/dev/mapper/ARCH" ]]; then
         state "Open main LUKS container"
-        while ! eval cryptsetup luksOpen "${ARCHCMD_DEVICE}$ARCHCMD_MAIN_PARTITION" ARCH; do
+        while ! eval cryptsetup luksOpen "${DEVICE}$MAIN_PARTITION" ARCH; do
             sleep 1
         done
     fi
 
     if [[ ! -e "/dev/mapper/ARCH_BOOT" ]]; then
         state "Open /boot LUKS container"
-        while ! eval cryptsetup luksOpen "${ARCHCMD_DEVICE}$ARCHCMD_BOOT_PARTITION" ARCH_BOOT; do
+        while ! eval cryptsetup luksOpen "${DEVICE}$BOOT_PARTITION" ARCH_BOOT; do
             sleep 1
         done
     fi
@@ -43,40 +43,40 @@ cmd-mount() {
         sleep 2
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR " "/proc/mounts"; then
         state "Mount root subvolume"
-        mkdir -p "$ARCHCMD_TARGET_DIR"
-        mount -o subvol="/btrfs/current/ROOT" "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR"
+        mkdir -p "$TARGET_DIR"
+        mount -o subvol="/btrfs/current/ROOT" "/dev/archlinux/root" "$TARGET_DIR"
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR/home " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR/home " "/proc/mounts"; then
         state "Mount home subvolume"
-        mkdir -p "$ARCHCMD_TARGET_DIR/home"
-        mount -o nodev,nosuid,subvol="/btrfs/current/home" "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR/home"
+        mkdir -p "$TARGET_DIR/home"
+        mount -o nodev,nosuid,subvol="/btrfs/current/home" "/dev/archlinux/root" "$TARGET_DIR/home"
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR/var/lib/rootfs " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR/var/lib/rootfs " "/proc/mounts"; then
         state "Mount drive as rootfs"
-        mkdir -p "$ARCHCMD_TARGET_DIR/var/lib/rootfs"
-        mount -o nodev,nosuid,noexec "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR/var/lib/rootfs"
+        mkdir -p "$TARGET_DIR/var/lib/rootfs"
+        mount -o nodev,nosuid,noexec "/dev/archlinux/root" "$TARGET_DIR/var/lib/rootfs"
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR/boot " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR/boot " "/proc/mounts"; then
         state "Mount boot partition"
-        mkdir -p "$ARCHCMD_TARGET_DIR/boot"
-        mount -o noauto,nodev,nosuid,noexec "/dev/mapper/ARCH_BOOT" "$ARCHCMD_TARGET_DIR/boot"
+        mkdir -p "$TARGET_DIR/boot"
+        mount -o noauto,nodev,nosuid,noexec "/dev/mapper/ARCH_BOOT" "$TARGET_DIR/boot"
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR/tmp " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR/tmp " "/proc/mounts"; then
         state "Mount tmp partition"
-        mkdir -p "$ARCHCMD_TARGET_DIR/tmp"
-        mount -o nodev,nosuid,size=4G "tmpfs" "$ARCHCMD_TARGET_DIR/tmp" -t tmpfs
+        mkdir -p "$TARGET_DIR/tmp"
+        mount -o nodev,nosuid,size=4G "tmpfs" "$TARGET_DIR/tmp" -t tmpfs
     fi
 
-    if ! grep -qs "$ARCHCMD_TARGET_DIR/var/lib/data " "/proc/mounts"; then
+    if ! grep -qs "$TARGET_DIR/var/lib/data " "/proc/mounts"; then
         state "Mount data partition"
-        mkdir -p "$ARCHCMD_TARGET_DIR/var/lib/data"
-        mount -o noauto,nodev,nosuid,noexec "${ARCHCMD_DEVICE}$ARCHCMD_DATA_PARTITION" "$ARCHCMD_TARGET_DIR/var/lib/data"
+        mkdir -p "$TARGET_DIR/var/lib/data"
+        mount -o noauto,nodev,nosuid,noexec "${DEVICE}$DATA_PARTITION" "$TARGET_DIR/var/lib/data"
     fi
 
     if ! grep -qs "partition" "/proc/swaps"; then

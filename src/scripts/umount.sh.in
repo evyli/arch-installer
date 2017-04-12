@@ -23,9 +23,9 @@ cmd-umount() {
     state "Synchronise disks"
     sync
 
-    if grep -qs "$ARCHCMD_TARGET_DIR " "/proc/mounts"; then
+    if grep -qs "$TARGET_DIR " "/proc/mounts"; then
         state "Unmount all partitions"
-        umount -R "$ARCHCMD_TARGET_DIR" || umount "$ARCHCMD_TARGET_DIR"
+        umount -R "$TARGET_DIR" || umount "$TARGET_DIR"
     fi
 
     if grep -qs "partition" "/proc/swaps"; then

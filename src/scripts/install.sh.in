@@ -26,7 +26,7 @@ cmd-install() {
 
     state "Bootstrap system"
     local pacstrap_packages=(base)
-    pacstrap "$ARCHCMD_TARGET_DIR" "${pacstrap_packages[@]}"
+    pacstrap "$TARGET_DIR" "${pacstrap_packages[@]}"
 
     state "Update pacman file database"
     target-exec pacman -Fy
@@ -49,34 +49,34 @@ cmd-install() {
 
     state "Configure locales"
     target-exec sed -i 's/^/#/g' "/etc/locale.gen"
-    for locale in "${ARCHCMD_LOCALES[@]}"; do
-        echo "${locale}" >>"$ARCHCMD_TARGET_DIR/etc/locale.gen"
+    for locale in "${LOCALES[@]}"; do
+        echo "${locale}" >>"$TARGET_DIR/etc/locale.gen"
     done
     target-exec locale-gen
 
-    state "Set ${ARCHCMD_LOCALES[0]} as main locale"
-    echo "LANG=\"${ARCHCMD_LOCALES[0]}\"" >"$ARCHCMD_TARGET_DIR/etc/locale.conf"
+    state "Set ${LOCALES[0]} as main locale"
+    echo "LANG=\"${LOCALES[0]}\"" >"$TARGET_DIR/etc/locale.conf"
 
     state "Configure terminal"
-    echo "KEYMAP=$ARCHCMD_KEYMAP" >"$ARCHCMD_TARGET_DIR/etc/vconsole.conf"
-    echo "FONT=$ARCHCMD_FONT" >>"$ARCHCMD_TARGET_DIR/etc/vconsole.conf"
+    echo "KEYMAP=$KEYMAP" >"$TARGET_DIR/etc/vconsole.conf"
+    echo "FONT=$FONT" >>"$TARGET_DIR/etc/vconsole.conf"
 
     state "Configure zone"
     target-exec rm -f "/etc/localtime"
-    target-exec ln -s "/usr/share/zoneinfo/$ARCHCMD_ZONE" "/etc/localtime"
+    target-exec ln -s "/usr/share/zoneinfo/$ZONE" "/etc/localtime"
 
     state "Configure hardware clock"
     target-exec hwclock --systohc --utc
 
     state "Generate fstab"
-    genfstab -U "$ARCHCMD_TARGET_DIR" > "$ARCHCMD_TARGET_DIR/etc/fstab"
+    genfstab -U "$TARGET_DIR" > "$TARGET_DIR/etc/fstab"
 
     state "Configure hosts and hostname"
-    echo "$ARCHCMD_HOSTNAME" >"$ARCHCMD_TARGET_DIR/etc/hostname"
-    cp "/etc/hosts" "$ARCHCMD_TARGET_DIR/etc/hosts"
-    { echo "127.0.0.1 $ARCHCMD_HOSTNAME.localdomain $ARCHCMD_HOSTNAME";
+    echo "$HOSTNAME" >"$TARGET_DIR/etc/hostname"
+    cp "/etc/hosts" "$TARGET_DIR/etc/hosts"
+    { echo "127.0.0.1 $HOSTNAME.localdomain $HOSTNAME";
       echo "ff02::1 ip6-allnodes";
-      echo "ff02::2 ip6-allrouters"; } >>"$ARCHCMD_TARGET_DIR/etc/hosts"
+      echo "ff02::2 ip6-allrouters"; } >>"$TARGET_DIR/etc/hosts"
 
     state "Set root password"
     while ! target-exec passwd; do
@@ -85,36 +85,36 @@ cmd-install() {
 
     state "Configure sudo"
     target-install "sudo"
-    echo "%wheel ALL=(ALL) ALL" >"$ARCHCMD_TARGET_DIR/etc/sudoers.d/wheel"
+    echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
 
     state "Configure mkinitcpio hooks"
     target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev autodetect modconf block keyboard keymap encrypt lvm2 resume filesystems fsck\""
 
     state "Configure /boot to be mounted via crypttab"
     local boot_uuid
-    boot_uuid="$(blkid "${ARCHCMD_DEVICE}$ARCHCMD_BOOT_PARTITION" | sed -n 's/.* UUID=\"\([^\"]*\)\".*/\1/p')"
-    if ! grep -qs "$boot_uuid" "$ARCHCMD_TARGET_DIR/etc/crypttab"; then
-        echo "boot UUID=$boot_uuid none luks" >>"$ARCHCMD_TARGET_DIR/etc/crypttab"
+    boot_uuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* UUID=\"\([^\"]*\)\".*/\1/p')"
+    if ! grep -qs "$boot_uuid" "$TARGET_DIR/etc/crypttab"; then
+        echo "boot UUID=$boot_uuid none luks" >>"$TARGET_DIR/etc/crypttab"
     fi
-    sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$ARCHCMD_TARGET_DIR/etc/fstab"
+    sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$TARGET_DIR/etc/fstab"
 
     state "Build kernel image"
     target-exec mkinitcpio -p linux
 
     state "Configure grub"
     local mainpartition_partuuid
-    mainpartition_partuuid="$(blkid "${ARCHCMD_DEVICE}$ARCHCMD_MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
+    mainpartition_partuuid="$(blkid "${DEVICE}$MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
     target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 2
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "false"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 0
-    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"quiet cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${ARCHCMD_LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
+    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"quiet cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
     target-exec grub-mkconfig -o "/boot/grub/grub.cfg"
 
     state "Install grub"
-    target-exec grub-install --recheck "$ARCHCMD_DEVICE" --modules="part_gpt part_msdos"
+    target-exec grub-install --recheck "$DEVICE" --modules="part_gpt part_msdos"
 
     state "Optimise pacman"
     target-exec pacman-optimize

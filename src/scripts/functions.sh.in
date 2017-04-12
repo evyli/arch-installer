@@ -24,7 +24,7 @@ config-read() {
 }
 
 target-exec() {
-    arch-chroot "$ARCHCMD_TARGET_DIR" "$@"
+    arch-chroot "$TARGET_DIR" "$@"
 }
 
 target-install() {
@@ -32,7 +32,7 @@ target-install() {
 }
 
 target-config-set-entry() {
-    local file="$ARCHCMD_TARGET_DIR/$1"
+    local file="$TARGET_DIR/$1"
     local key
     key="$(quote-delimiter "$(quote-regex "$2")")"
     local value
