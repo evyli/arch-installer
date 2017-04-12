@@ -77,7 +77,7 @@ cmd-install() {
       echo "ff02::2 ip6-allrouters"; } >>"$ARCHCMD_TARGET_DIR/etc/hosts"
 
     state "Set root password"
-    while ! eval passwd; do
+    while ! target-exec passwd; do
         sleep 1
     done
 
