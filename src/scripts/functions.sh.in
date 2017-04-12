@@ -150,11 +150,11 @@ ask-Yes-n() {
 }
 
 state() {
-    echo "**" "$@"
+    echo -e "\e[1m\e[92m**\e[0m\e[97m" "$@" "\e[0m"
 }
 
 error() {
-    echo "**" "$@" >&2
+    echo -e "\e[1m\e[91m**\e[0m\e[97m" "$@" "\e[0m" >&2
 }
 
 die() {
