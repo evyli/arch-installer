@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+cmd-mount() {
+    config-read
+
+    if [[ ! -e "/dev/mapper/ARCH" ]]; then
+        state "Open main LUKS container"
+        while ! eval cryptsetup luksOpen "${ARCHCMD_DEVICE}$ARCHCMD_MAIN_PARTITION" ARCH; do
+            sleep 1
+        done
+    fi
+
+    if [[ ! -e "/dev/mapper/ARCH_BOOT" ]]; then
+        state "Open /boot LUKS container"
+        while ! eval cryptsetup luksOpen "${ARCHCMD_DEVICE}$ARCHCMD_BOOT_PARTITION" ARCH_BOOT; do
+            sleep 1
+        done
+    fi
+
+    if [[ ! -d "/dev/archlinux" ]]; then
+        state "Add LVM volumes"
+        vgscan
+        vgchange -ay archlinux
+        sleep 1
+        lvs
+        sleep 2
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR " "/proc/mounts"; then
+        state "Mount root subvolume"
+        mkdir -p "$ARCHCMD_TARGET_DIR"
+        mount -o subvol="/btrfs/current/ROOT" "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR"
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR/home " "/proc/mounts"; then
+        state "Mount home subvolume"
+        mkdir -p "$ARCHCMD_TARGET_DIR/home"
+        mount -o nodev,nosuid,subvol="/btrfs/current/home" "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR/home"
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR/var/lib/rootfs " "/proc/mounts"; then
+        state "Mount drive as rootfs"
+        mkdir -p "$ARCHCMD_TARGET_DIR/var/lib/rootfs"
+        mount -o nodev,nosuid,noexec "/dev/archlinux/root" "$ARCHCMD_TARGET_DIR/var/lib/rootfs"
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR/boot " "/proc/mounts"; then
+        state "Mount boot partition"
+        mkdir -p "$ARCHCMD_TARGET_DIR/boot"
+        mount -o noauto,nodev,nosuid,noexec "/dev/mapper/ARCH_BOOT" "$ARCHCMD_TARGET_DIR/boot"
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR/tmp " "/proc/mounts"; then
+        state "Mount tmp partition"
+        mkdir -p "$ARCHCMD_TARGET_DIR/tmp"
+        mount -o nodev,nosuid,size=4G "tmpfs" "$ARCHCMD_TARGET_DIR/tmp" -t tmpfs
+    fi
+
+    if ! grep -qs "$ARCHCMD_TARGET_DIR/var/lib/data " "/proc/mounts"; then
+        state "Mount data partition"
+        mkdir -p "$ARCHCMD_TARGET_DIR/var/lib/data"
+        mount -o noauto,nodev,nosuid,noexec "${ARCHCMD_DEVICE}$ARCHCMD_DATA_PARTITION" "$ARCHCMD_TARGET_DIR/var/lib/data"
+    fi
+
+    if ! grep -qs "partition" "/proc/swaps"; then
+        if swapon "/dev/archlinux/swap"; then
+            state "Activated swap partition"
+        fi
+    fi
+}
