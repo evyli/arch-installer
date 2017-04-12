@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+cmd-umount() {
+    config-read
+
+    state "Synchronise disks"
+    sync
+
+    if grep -qs "$ARCHCMD_TARGET_DIR " "/proc/mounts"; then
+        state "Unmount all partitions"
+        umount -R "$ARCHCMD_TARGET_DIR" || umount "$ARCHCMD_TARGET_DIR"
+    fi
+
+    if grep -qs "partition" "/proc/swaps"; then
+        state "Deactivate swap partition"
+        swapoff "/dev/archlinux/swap"
+    fi
+
+    state "Try to remove LVM volumes"
+    vgchange -an "archlinux" >/dev/null 2>/dev/null || true
+    pvchange -xn "/dev/mapper/ARCH" >/dev/null 2>/dev/null || true
+
+    if [[ -e "/dev/mapper/ARCH" ]]; then
+        state "Close LUKS container"
+        cryptsetup luksClose "/dev/mapper/ARCH"
+    fi
+
+    if [[ -e "/dev/mapper/ARCH_BOOT" ]]; then
+        state "Close LUKS /boot"
+        cryptsetup luksClose "/dev/mapper/ARCH_BOOT"
+    fi
+}
