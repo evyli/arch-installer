@@ -1,0 +1,193 @@
+#!/bin/bash
+#
+# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+config-read() {
+    export ARCHCMD_BOOT_PARTITION=1
+    export ARCHCMD_DATA_PARTITION=5
+    export ARCHCMD_MAIN_PARTITION=6
+
+    export ARCHCMD_DEVICE="/dev/sda"
+
+    export ARCHCMD_WIPE_SECURE=0
+
+    #export ARCHCMD_DATA_SIZE=4G
+    #export ARCHCMD_SWAP_SIZE=18G
+    export ARCHCMD_DATA_SIZE=1G
+    export ARCHCMD_SWAP_SIZE=1G
+
+    #export ARCHCMD_MAIN_ENCRYPTION_OPTIONS=("--iter-time=30000")
+    #export ARCHCMD_BOOT_ENCRYPTION_OPTIONS=("--iter-time=30000")
+    export ARCHCMD_MAIN_ENCRYPTION_OPTIONS=("--iter-time=1")
+    export ARCHCMD_BOOT_ENCRYPTION_OPTIONS=("--iter-time=1")
+
+    export ARCHCMD_HOSTNAME="archlinux"
+
+    export ARCHCMD_TARGET_DIR="/archlinux"
+
+    export ARCHCMD_LOCALES=("en_GB.UTF-8 UTF-8" "de_DE.UTF-8 UTF-8")
+    export ARCHCMD_KEYMAP="uk"
+    export ARCHCMD_FONT="Lat2-Terminus16"
+    export ARCHCMD_ZONE="Europe/Berlin"
+}
+
+target-exec() {
+    arch-chroot "$ARCHCMD_TARGET_DIR" "$@"
+}
+
+target-install() {
+    target-exec pacman --needed -S --noconfirm "$@"
+}
+
+target-config-set-entry() {
+    local file="$ARCHCMD_TARGET_DIR/$1"
+    local key
+    key="$(quote-delimiter "$(quote-regex "$2")")"
+    local value
+    value="$(quote-delimiter "$3")"
+    local sep="${4:-=}"
+    touch "$file"
+    # Uncomment line if line exists only commented
+    egrep -q "^$key\s*$sep\s*.*\$" "$file" || sed -i "0,/^#\s*$key\s*$sep\s*.*\$/ s/^#\s*\($key\s*$sep\s*.*\$\)/\1/" "$file"
+    # Replace entry. Otherwise: append the entry to the file
+    egrep -q "^$key\s*$sep\s*.*\$" "$file" && sed -i "0,/^$key\s*$sep\s*.*\$/ s/^\($key\s*$sep\s*\).*\$/\1$value/" "$file" || echo "$2$sep$3" >> "$file"
+}
+
+trim() {
+    sed -e 's/^[[:space:]]*//' \
+        | sed -e 's/[[:space:]]*$//'
+}
+
+input() {
+    local pattern=""
+    local defaultval=""
+    local silent=0
+    local silentflag=""
+    local double_check=0
+    local prompt=""
+
+    while [[ "${1:-}" ]]; do
+        case "${1:-}" in
+            -p) prompt="${2:-}"; shift;;
+            -s) silent=1; silentflag="s";;
+            -c) double_check=1;;
+            -g) pattern="${2:-}"; shift;;
+            -d) defaultval="${2:-}"; shift;;
+            *) die "Invalid input arg '$1'"
+        esac
+        shift || true
+    done
+
+    prompt-output() {
+        local prompt_end=""
+        if [[ -n "${prompt:-}" ]]; then
+            prompt_end=":"
+        fi
+        echo -n " >>> $prompt${1:-}$prompt_end "
+    }
+
+    while :; do
+        prompt-output
+        local input
+        read "-r${silentflag:-}" input
+        (( silent )) && echo
+        input="$(echo -n "$input" | trim)"
+        if [[ -z "$input" ]]; then
+            input="${defaultval:-}"
+        fi
+
+        if [[ -n "$pattern" ]]; then
+            if printf "%s" "$input" | egrep -qsv "$pattern"; then
+                error "Input does not match pattern: '$pattern'"
+                continue
+            fi
+        fi
+
+        if (( double_check )); then
+            prompt-output " (again)"
+            local input2
+            read "-r${silentflag:-}" input2
+            (( silent )) && echo
+            input2="$(echo -n "$input2" | trim)"
+            if [[ -z "$input2" ]]; then
+                input2="${defaultval:-}"
+            fi
+            if [[ "$input" != "$input2" ]]; then
+                error "Inputs do not match"
+                continue
+            fi
+        fi
+        READ_INPUT="$input"
+        return 0
+    done
+}
+
+input-passphrase() {
+    local pass="$1"
+    shift
+    input -p " Enter passphrase for '$pass'" -s -c "$@"
+}
+
+do-ask() {
+    local question="$1"
+    local yestext="$2"
+    local notext="$3"
+    local default="$4"
+    shift 4
+    input -d "$default" -p " $question [$yestext/$notext]" "$@"
+    case "${READ_INPUT:-}" in
+        y|yes)
+            return 0;;
+        n|no)
+            return 1;;
+        *)
+            return 2;;
+    esac
+}
+
+ask-y-No() {
+    local question="$1"
+    shift
+    do-ask "$question" "yes" "NO" "n" "$@"
+}
+
+ask-Yes-n() {
+    local question="$1"
+    shift
+    do-ask "$question" "YES" "no" "y" "$@"
+}
+
+state() {
+    echo "**" "$@"
+}
+
+error() {
+    echo "**" "$@" >&2
+}
+
+die() {
+    error "$@"
+    exit 42
+}
+
+quote-regex() {
+    sed 's/[]\.|$(){}?+*^]/\\&/g' <<< "$*"
+}
+
+quote-delimiter() {
+    sed 's#/#\\/#g' <<< "$*"
+}
