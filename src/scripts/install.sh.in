@@ -96,6 +96,7 @@ cmd-install() {
     if ! grep -qs "$boot_uuid" "$ARCHCMD_TARGET_DIR/etc/crypttab"; then
         echo "boot UUID=$boot_uuid none luks" >>"$ARCHCMD_TARGET_DIR/etc/crypttab"
     fi
+    sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$ARCHCMD_TARGET_DIR/etc/fstab"
 
     state "Build kernel image"
     target-exec mkinitcpio -p linux
