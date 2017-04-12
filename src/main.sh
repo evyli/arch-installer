@@ -20,13 +20,22 @@ IFS=$'\n\t'
 
 help() {
     cat << EOF
-    chroot)
-    disk-partition)
-    install)
-    livedisk-init)
-    livedisk-increase-cowspace-size)
-    mount)
-    umount)
+usage: $0 <cmd>
+
+Commands:
+    chroot
+    disk-partition
+    install
+    livedisk-init
+    livedisk-increase-cowspace-size
+    mount
+    umount
+    help
+
+Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions.
 EOF
 }
 
