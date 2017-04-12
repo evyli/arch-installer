@@ -1,4 +1,4 @@
-#+TITLE: bootstrap-arch
+#+TITLE: arch-installer
 #+LANGUAGE: en
 
 This repository is a minimal version of my *ArchLinux* installer by just configuring
