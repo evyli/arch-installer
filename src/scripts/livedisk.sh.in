@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+cmd-livedisk-init() {
+    config-read
+
+    state "Setup keys"
+    if ! loadkeys "$ARCHCMD_KEYMAP"; then
+        die "Keymap could not be set"
+    fi
+
+    state "Search for fast mirrors and update repositories"
+    if [[ ! -f "/etc/pacman.d/mirrorlist.backup" ]]; then
+        mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+    fi
+    if [[ ! -f "/etc/pacman.d/mirrorlist" ]]; then
+        rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup >/etc/pacman.d/mirrorlist || rm -f "/etc/pacman.d/mirrorlist"
+        pacman -Syy
+    else
+        pacman -Sy
+    fi
+}
+
+cmd-livedisk-increase-cowspace-size() {
+    mount -o size=1G,remount /run/archiso/cowspace
+}
