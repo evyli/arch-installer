@@ -19,6 +19,8 @@
 cmd-install() {
     config-read
 
+    category "Start installation procedure"
+
     state "Update packages"
     pacman -Sy
 
@@ -116,5 +118,5 @@ cmd-install() {
     state "Optimise pacman"
     target-exec pacman-optimize
 
-    state "Installation is done"
+    category "Installation is done"
 }

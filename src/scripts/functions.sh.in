@@ -75,7 +75,7 @@ input() {
         if [[ -n "${prompt:-}" ]]; then
             prompt_end=":"
         fi
-        echo -n " >>> $prompt${1:-}$prompt_end "
+        msg " >>> $prompt${1:-}$prompt_end "
     }
 
     while :; do
@@ -149,12 +149,20 @@ ask-Yes-n() {
     do-ask "$question" "YES" "no" "y" "$@"
 }
 
+category() {
+    echo -e " \e[1m\e[94m==>\e[0m\e[97m" "$@" "\e[0m"
+}
+
 state() {
-    echo -e " \e[1m\e[92m**\e[0m\e[97m" "$@" "\e[0m"
+    echo -e " \e[1m\e[92m ~>\e[0m\e[97m" "$@" "\e[0m"
 }
 
 error() {
-    echo -e " \e[1m\e[91m**\e[0m\e[97m" "$@" "\e[0m" >&2
+    echo -e " \e[1m\e[91m *>\e[0m\e[97m" "$@" "\e[0m" >&2
+}
+
+msg() {
+    echo -ne "\e[97m" "$@" "\e[0m"
 }
 
 die() {

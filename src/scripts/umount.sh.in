@@ -18,6 +18,8 @@
 cmd-umount() {
     config-read
 
+    category "Unmounting system"
+
     state "Synchronise disks"
     sync
 
@@ -44,4 +46,6 @@ cmd-umount() {
         state "Close LUKS /boot"
         cryptsetup luksClose "/dev/mapper/ARCH_BOOT"
     fi
+
+    category "Unmounting system is done"
 }

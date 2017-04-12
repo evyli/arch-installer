@@ -18,6 +18,8 @@
 cmd-mount() {
     config-read
 
+    category "Mounting system"
+
     if [[ ! -e "/dev/mapper/ARCH" ]]; then
         state "Open main LUKS container"
         while ! eval cryptsetup luksOpen "${ARCHCMD_DEVICE}$ARCHCMD_MAIN_PARTITION" ARCH; do
@@ -82,4 +84,6 @@ cmd-mount() {
             state "Activated swap partition"
         fi
     fi
+
+    category "Mounting system is done"
 }

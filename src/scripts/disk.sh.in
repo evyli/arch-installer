@@ -35,7 +35,7 @@ cmd-disk-partition() {
     fi
 
     if (( ARCHCMD_WIPE_SECURE )); then
-        state "Securely wipe hard drive"
+        category "Securely wipe hard drive"
         cryptsetup open --type plain "$ARCHCMD_DEVICE" SEC_DRIVE --key-file "/dev/random"
         local bytes_size
         bytes_size="$(blockdev --getsize64 "/dev/mapper/SEC_DRIVE")"
@@ -46,7 +46,7 @@ cmd-disk-partition() {
         cryptsetup close SEC_DRIVE
     fi
 
-    state "Create partitions on device: $ARCHCMD_DEVICE"
+    category "Create partitions on device: $ARCHCMD_DEVICE"
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk "$ARCHCMD_DEVICE"
   o # clear the in memory partition table
   n # new partition
@@ -73,12 +73,12 @@ cmd-disk-partition() {
 EOF
     sleep 2
     partprobe "$ARCHCMD_DEVICE" || true
-    state "Synchronise changes to hard disk"
+    category "Synchronise changes to hard disk"
     sync
-    state "Wait a few seconds to prevent script failure"
+    category "Wait a few seconds to prevent script failure"
     sleep 10
 
-    state "Encrypting main container"
+    category "Encrypting main container"
     state "Create LUKS container"
     while ! eval cryptsetup luksFormat "${ARCHCMD_DEVICE}$ARCHCMD_MAIN_PARTITION" "${ARCHCMD_MAIN_ENCRYPTION_OPTIONS[@]:-}"; do
         sleep 1
@@ -91,7 +91,7 @@ EOF
     done
     sync
 
-    state "Encrypting /boot"
+    category "Encrypting /boot"
     state "Create LUKS container"
     while ! eval cryptsetup luksFormat "${ARCHCMD_DEVICE}$ARCHCMD_BOOT_PARTITION" "${ARCHCMD_BOOT_ENCRYPTION_OPTIONS[@]:-}"; do
         sleep 1
@@ -104,6 +104,7 @@ EOF
     done
     sync
 
+    category "Creating LVM volumes"
     while ! eval pvcreate -ff "/dev/mapper/ARCH"; do
         sleep 1
     done
@@ -112,6 +113,7 @@ EOF
     lvcreate -l +100%FREE archlinux -n root
     sleep 2
 
+    category "Creating file systems"
     mkfs.btrfs -f -L "$ARCHCMD_HOSTNAME-root" "/dev/mapper/archlinux-root"
     local target_raw_dir="/tmp/archcmd-archlinux-raw"
     mkdir -p "$target_raw_dir"
@@ -128,5 +130,8 @@ EOF
     mkfs.btrfs -f -L "$ARCHCMD_HOSTNAME-boot" "/dev/mapper/ARCH_BOOT"
     mkfs.btrfs -f -L "$ARCHCMD_HOSTNAME-data" "${ARCHCMD_DEVICE}$ARCHCMD_DATA_PARTITION"
 
+    category "Creating Swap"
     mkswap -f -L swap "/dev/mapper/archlinux-swap"
+
+    category "Partitioning is done"
 }
