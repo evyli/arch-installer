@@ -57,7 +57,7 @@ cmd-install() {
     target-exec locale-gen
 
     state "Set ${LOCALES[0]} as main locale"
-    echo "LANG=\"${LOCALES[0]}\"" >"$TARGET_DIR/etc/locale.conf"
+    echo "LANG=\"$(echo "${LOCALES[0]}" | cut -f 1 -d ' ')\"" >"$TARGET_DIR/etc/locale.conf"
 
     state "Configure terminal"
     echo "KEYMAP=$KEYMAP" >"$TARGET_DIR/etc/vconsole.conf"
