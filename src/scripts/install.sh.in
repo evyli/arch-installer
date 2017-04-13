@@ -121,5 +121,9 @@ cmd-install() {
     state "Optimise pacman"
     target-exec pacman-optimize
 
+    state "Backup the luksheader"
+    cryptsetup luksHeaderBackup "${DEVICE}$MAIN_PARTITION" --header-backup-file "$TARGET_DIR/root/root.luksheader"
+    cryptsetup luksHeaderBackup "${DEVICE}$BOOT_PARTITION" --header-backup-file "$TARGET_DIR/root/boot.luksheader"
+
     category "Installation is done"
 }
