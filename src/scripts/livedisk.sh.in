@@ -33,7 +33,7 @@ cmd-livedisk-init() {
     fi
     if [[ ! -f "/etc/pacman.d/mirrorlist" ]]; then
         state "Run rankmirrors"
-        rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup >/etc/pacman.d/mirrorlist || rm -f "/etc/pacman.d/mirrorlist"
+        rankmirrors -n 0 /etc/pacman.d/mirrorlist.backup >/etc/pacman.d/mirrorlist || rm -f "/etc/pacman.d/mirrorlist"
         state "Update repositories"
         pacman -Syy
     else
