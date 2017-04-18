@@ -90,7 +90,7 @@ cmd-install() {
     echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
 
     state "Configure mkinitcpio hooks"
-    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev autodetect modconf block keyboard keymap encrypt lvm2 resume filesystems fsck\""
+    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap encrypt lvm2 resume filesystems fsck\""
 
     state "Configure /boot to be mounted via crypttab"
     local boot_uuid
