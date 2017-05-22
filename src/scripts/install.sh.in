@@ -116,7 +116,7 @@ cmd-install() {
     target-exec grub-mkconfig -o "/boot/grub/grub.cfg"
 
     state "Install grub"
-    target-exec grub-install --recheck "$DEVICE" --modules="part_gpt part_msdos"
+    target-exec grub-install --target=i386-pc --recheck "$DEVICE" --modules="part_gpt part_msdos"
 
     state "Optimise pacman"
     target-exec pacman-optimize
