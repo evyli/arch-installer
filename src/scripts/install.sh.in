@@ -113,7 +113,17 @@ cmd-install() {
     target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"quiet cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
-    target-exec grub-mkconfig -o "/boot/grub/grub.cfg"
+    mkdir "$TARGET_DIR/hostlvm"
+    mount --bind /run/lvm "$TARGET_DIR/hostlvm"
+    cat > "$TARGET_DIR/configure-grub.sh" <<EOF
+#!/bin/bash
+ln -s /hostlvm /run/lvm
+grub-mkconfig -o /boot/grub/grub.cfg
+EOF
+    chmod +x "$TARGET_DIR/configure-grub.sh"
+    target-exec /configure-grub.sh
+    umount "$TARGET_DIR/hostlvm"
+    rmdir "$TARGET_DIR/hostlvm"
 
     state "Install grub"
     target-exec grub-install --target=i386-pc --recheck "$DEVICE" --modules="part_gpt part_msdos"
