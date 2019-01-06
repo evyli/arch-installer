@@ -73,12 +73,6 @@ cmd-mount() {
         mount -o nodev,nosuid,size=4G "tmpfs" "$TARGET_DIR/tmp" -t tmpfs
     fi
 
-    if ! grep -qs "$TARGET_DIR/var/lib/data " "/proc/mounts"; then
-        state "Mount data partition"
-        mkdir -p "$TARGET_DIR/var/lib/data"
-        mount -o noauto,nodev,nosuid,noexec "${DEVICE}$DATA_PARTITION" "$TARGET_DIR/var/lib/data"
-    fi
-
     if ! grep -qs "partition" "/proc/swaps"; then
         if swapon "/dev/archlinux/swap"; then
             state "Activated swap partition"

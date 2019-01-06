@@ -59,9 +59,6 @@ cmd-disk-partition() {
     # partion number 2
     # default, start immediately after preceding partition
     # default, extend partition to end of disk
-  n # new partition DATA
-    # default, start immediately after preceding partition
-  +$DATA_SIZE # Size of data partition
   n # new partition MAIN
     # default, start immediately after preceding partition
     # default, extend partition to end of disk
@@ -128,7 +125,6 @@ EOF
     rmdir "$target_raw_dir"
 
     mkfs.btrfs -f -L "$HOSTNAME-boot" "/dev/mapper/ARCH_BOOT"
-    mkfs.btrfs -f -L "$HOSTNAME-data" "${DEVICE}$DATA_PARTITION"
 
     category "Creating Swap"
     mkswap -f -L swap "/dev/mapper/archlinux-swap"
