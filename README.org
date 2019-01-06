@@ -7,7 +7,7 @@ the encrypted partitions and configure *Arch* to boot those.
 * Preparations
 
 1. Increase the cowspace size on the livedisk: ~mount -o size=1G,remount /run/archiso/cowspace~
-2. Install required packages: ~pacman -Sy && pacman -S git make m4~
+2. Install required packages: ~pacman -Sy && pacman -S pacman-contrib git make m4~
 3. Pull the repository: ~git clone https://github.com/nytthea/arch-installer.git~
 4. Run ~make~ inside the repository
 
