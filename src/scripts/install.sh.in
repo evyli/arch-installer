@@ -43,7 +43,7 @@ cmd-install() {
                           # network dependencies
                           iw wpa_supplicant dialog wpa_actiond ifplugd
                           # pacman utils
-                          pacman-mirrorlist pkgfile)
+                          pacman-contrib pacman-mirrorlist pkgfile)
     target-install "${base_packages[@]}"
 
     state "Load pkgfile data"
