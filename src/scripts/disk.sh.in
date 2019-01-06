@@ -77,7 +77,7 @@ EOF
 
     category "Encrypting main container"
     state "Create LUKS container"
-    while ! eval cryptsetup luksFormat "${DEVICE}$MAIN_PARTITION" "${MAIN_ENCRYPTION_OPTIONS[@]:-}"; do
+    while ! eval cryptsetup luksFormat --type=luks "${DEVICE}$MAIN_PARTITION" "${MAIN_ENCRYPTION_OPTIONS[@]:-}"; do
         sleep 1
     done
     sync
@@ -90,7 +90,7 @@ EOF
 
     category "Encrypting /boot"
     state "Create LUKS container"
-    while ! eval cryptsetup luksFormat "${DEVICE}$BOOT_PARTITION" "${BOOT_ENCRYPTION_OPTIONS[@]:-}"; do
+    while ! eval cryptsetup luksFormat --type=luks "${DEVICE}$BOOT_PARTITION" "${BOOT_ENCRYPTION_OPTIONS[@]:-}"; do
         sleep 1
     done
     sync
