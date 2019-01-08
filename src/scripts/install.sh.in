@@ -25,15 +25,8 @@ cmd-install() {
     pacman -Sy
 
     state "Bootstrap system"
-    local pacstrap_packages=(base)
-    pacstrap "$TARGET_DIR" "${pacstrap_packages[@]}"
-
-    state "Update pacman file database"
-    target-exec pacman -Fy
-
-    state "Base installation"
-    local base_packages=( # late install of base-devel
-                          base-devel
+    local base_packages=( # base
+                          base base-devel
                           # maintenance
                           polkit
                           # boot utils
@@ -44,7 +37,10 @@ cmd-install() {
                           iw wpa_supplicant dialog wpa_actiond ifplugd
                           # pacman utils
                           pacman-contrib pacman-mirrorlist pkgfile)
-    target-install "${base_packages[@]}"
+    pacstrap "$TARGET_DIR" "${base_packages[@]}"
+
+    state "Update pacman file database"
+    target-exec pacman -Fy
 
     state "Load pkgfile data"
     target-exec pkgfile -u
