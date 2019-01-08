@@ -26,6 +26,8 @@ cmd-install() {
 
     state "Configure etckeeper"
     target-exec etckeeper init
+    target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
+    target-exec bash -c 'cd /etc && git config user.name "root"'
     target-exec systemctl enable etckeeper.timer
     target-exec etckeeper commit "After bootstrap"
 
