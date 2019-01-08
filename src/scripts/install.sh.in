@@ -165,5 +165,8 @@ EOF
     state "Lock root account"
     target-exec passwd -l root
 
+    state "Disable reboot key combination"
+    target-exec systemctl mask ctrl-alt-del.target
+
     category "Installation is done"
 }
