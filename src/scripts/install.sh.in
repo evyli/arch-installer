@@ -181,6 +181,7 @@ EOF
 
     state "Configure mlocate"
     target-install mlocate
+    target-exec updatedb
 
     state "Etckeeper final commit"
     target-exec etckeeper commit "After installation"
