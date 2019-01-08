@@ -157,7 +157,7 @@ EOF
     sync
 
     state "Create user account"
-    target-exec useradd -m -U -G "users,$GROUPS" "$USER"
+    target-exec useradd -m -G "users,$GROUPS" "$USER"
     while ! target-exec passwd "$USER"; do
         sleep 1
     done
