@@ -84,7 +84,7 @@ cmd-install() {
     target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt lvm2 resume filesystems fsck\""
 
     state "Create devices keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.devices.key" bs=1024 count=1024
+    dd if=/dev/urandom of="$TARGET_DIR/root/.devices.key" bs=1024 count=8192
     chmod 0400 "$TARGET_DIR/root/.devices.key"
 
     state "Configure /boot to be mounted via crypttab"
