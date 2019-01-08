@@ -36,6 +36,8 @@ cmd-install() {
                           base-devel
                           # maintenance
                           polkit
+                          # hardware utils
+                          lm_sensors
                           # boot utils
                           btrfs-progs grub
                           # basic user utils
@@ -167,6 +169,11 @@ EOF
 
     state "Disable reboot key combination"
     target-exec systemctl mask ctrl-alt-del.target
+
+    state "Configure sensors"
+    while ! target-exec sensors-detect; do
+        sleep 1
+    done
 
     category "Installation is done"
 }
