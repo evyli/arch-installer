@@ -127,13 +127,14 @@ EOF
     cryptsetup luksHeaderBackup "${DEVICE}$MAIN_PARTITION" --header-backup-file "$TARGET_DIR/root/.backups/root.luksheader"
     cryptsetup luksHeaderBackup "${DEVICE}$BOOT_PARTITION" --header-backup-file "$TARGET_DIR/root/.backups/boot.luksheader"
 
-    state "Setup network if interfaces were configured"
     if [[ "$ETH_INTERFACE" != "" ]]; then
+        state "Setup ifplugd Ethernet"
         target-exec systemctl enable "netctl-ifplugd@$ETH_INTERFACE.service"
         cp "$TARGET_DIR/etc/netctl/examples/ethernet-dhcp" "$TARGET_DIR/etc/netctl/eth"
         sed -i "s/eth0/$ETH_INTERFACE/g" "$TARGET_DIR/etc/netctl/eth"
     fi
     if [[ "$WIFI_INTERFACE" != "" ]]; then
+        state "Setup auto Wifi"
         target-exec systemctl enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
 
