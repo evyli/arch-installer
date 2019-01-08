@@ -31,14 +31,12 @@ cmd-bootstrap() {
                           polkit
                           # boot utils
                           btrfs-progs grub
-                          # system utils
-                          etckeeper
                           # basic user utils
                           rsync vim git
                           # network dependencies
                           iw wpa_supplicant dialog wpa_actiond ifplugd
                           # pacman utils
-                          pacman-contrib pacman-mirrorlist pkgfile)
+                          pacman-contrib pacman-mirrorlist)
     pacstrap "$TARGET_DIR" "${base_packages[@]}"
 
     category "Bootstrapping is done"

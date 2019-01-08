@@ -25,6 +25,7 @@ cmd-install() {
     pacman -Sy
 
     state "Configure etckeeper"
+    target-install etckeeper
     target-exec etckeeper init
     target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
     target-exec bash -c 'cd /etc && git config user.name "root"'
@@ -34,7 +35,8 @@ cmd-install() {
     state "Update pacman file database"
     target-exec pacman -Fy
 
-    state "Load pkgfile data"
+    state "Configure pkgfile"
+    target-install pkgfile
     target-exec pkgfile -u
 
     state "Configure locales"
