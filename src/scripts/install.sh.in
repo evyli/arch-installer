@@ -24,6 +24,11 @@ cmd-install() {
     state "Update packages"
     pacman -Sy
 
+    state "Configure etckeeper"
+    target-exec etckeeper init
+    target-exec systemctl enable etckeeper.timer
+    target-exec etckeeper commit "After bootstrap"
+
     state "Update pacman file database"
     target-exec pacman -Fy
 
@@ -169,6 +174,9 @@ EOF
         target-exec ufw default allow outgoing
         target-exec ufw enable
     fi
+
+    state "Etckeeper final commit"
+    target-exec etckeeper commit "After installation"
 
     category "Installation is done"
 }

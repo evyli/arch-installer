@@ -31,6 +31,8 @@ cmd-bootstrap() {
                           polkit
                           # boot utils
                           btrfs-progs grub
+                          # system utils
+                          etckeeper
                           # basic user utils
                           rsync vim git
                           # network dependencies
