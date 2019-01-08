@@ -91,18 +91,6 @@ cmd-install() {
     dd if=/dev/urandom of="$TARGET_DIR/root/.devices.key" bs=1024 count=1024
     chmod 0400 "$TARGET_DIR/root/.devices.key"
 
-    state "Add devices key to /"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.devices.key"; do
-        sleep 1
-    done
-    sync
-
-    state "Add devices key to /boot"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.devices.key"; do
-        sleep 1
-    done
-    sync
-
     state "Configure /boot to be mounted via crypttab"
     local boot_uuid
     boot_uuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* UUID=\"\([^\"]*\)\".*/\1/p')"
@@ -155,6 +143,18 @@ EOF
     if [[ "$WIFI_INTERFACE" != "" ]]; then
         target-exec systemctl enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
+
+    state "Add devices key to /"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.devices.key"; do
+        sleep 1
+    done
+    sync
+
+    state "Add devices key to /boot"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.devices.key"; do
+        sleep 1
+    done
+    sync
 
     state "Create user account"
     target-exec useradd -m -U -G "users,$GROUPS" "$USER"
