@@ -164,6 +164,10 @@ EOF
     state "Disable reboot key combination"
     target-exec systemctl mask ctrl-alt-del.target
 
+    state "Setup timesync"
+    target-exec systemctl enable systemd-timesyncd.service
+    target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
+
     if (( CONFIGURE_SENSORS )); then
         state "Configure sensors"
         target-install lm_sensors
