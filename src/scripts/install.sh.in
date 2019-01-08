@@ -179,6 +179,9 @@ EOF
         target-exec ufw enable
     fi
 
+    state "Configure mlocate"
+    target-install mlocate
+
     state "Etckeeper final commit"
     target-exec etckeeper commit "After installation"
 
