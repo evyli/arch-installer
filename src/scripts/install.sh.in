@@ -80,11 +80,6 @@ cmd-install() {
       echo "ff02::1 ip6-allnodes";
       echo "ff02::2 ip6-allrouters"; } >>"$TARGET_DIR/etc/hosts"
 
-    state "Set root password"
-    while ! target-exec passwd; do
-        sleep 1
-    done
-
     state "Configure sudo"
     target-install "sudo"
     echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
@@ -160,6 +155,15 @@ EOF
     if [[ "$WIFI_INTERFACE" != "" ]]; then
         target-exec systemctl enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
+
+    state "Create user account"
+    target-exec useradd -m -U -G "users,$GROUPS" "$USER"
+    while ! target-exec passwd "$USER"; do
+        sleep 1
+    done
+
+    state "Lock root account"
+    target-exec passwd -l root
 
     category "Installation is done"
 }
