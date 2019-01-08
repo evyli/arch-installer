@@ -36,10 +36,6 @@ cmd-install() {
                           base-devel
                           # maintenance
                           polkit
-                          # hardware utils
-                          lm_sensors
-                          # firewall
-                          ufw ufw-extras
                           # boot utils
                           btrfs-progs grub
                           # basic user utils
@@ -172,15 +168,21 @@ EOF
     state "Disable reboot key combination"
     target-exec systemctl mask ctrl-alt-del.target
 
-    state "Configure sensors"
-    while ! target-exec sensors-detect; do
-        sleep 1
-    done
+    if (( CONFIGURE_SENSORS )); then
+        state "Configure sensors"
+        target-install lm_sensors
+        while ! target-exec sensors-detect; do
+            sleep 1
+        done
+    fi
 
-    state "Configure firewall"
-    target-exec ufw enable
-    target-exec ufw default deny incoming
-    target-exec ufw default allow outgoing
+    if (( CONFIGURE_FIREWALL )); then
+        state "Configure firewall"
+        target-install ufw ufw-extras
+        target-exec ufw enable
+        target-exec ufw default deny incoming
+        target-exec ufw default allow outgoing
+    fi
 
     category "Installation is done"
 }
