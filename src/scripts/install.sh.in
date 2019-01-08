@@ -164,9 +164,10 @@ EOF
     if (( CONFIGURE_FIREWALL )); then
         state "Configure firewall"
         target-install ufw ufw-extras
-        target-exec ufw enable
+        target-exec systemctl enable ufw
         target-exec ufw default deny incoming
         target-exec ufw default allow outgoing
+        target-exec ufw enable
     fi
 
     category "Installation is done"
