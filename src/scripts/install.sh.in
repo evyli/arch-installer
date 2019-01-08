@@ -92,10 +92,18 @@ cmd-install() {
     state "Configure mkinitcpio hooks"
     target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt lvm2 resume filesystems fsck\""
 
-    state "Create /boot keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.boot-keyfile" bs=1024 count=32
-    chmod 0400 "$TARGET_DIR/root/.boot-keyfile"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.boot-keyfile"; do
+    state "Create devices keyfile"
+    dd if=/dev/urandom of="$TARGET_DIR/root/.devices.key" bs=1024 count=1024
+    chmod 0400 "$TARGET_DIR/root/.devices.key"
+
+    state "Add devices key to /"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.devices.key"; do
+        sleep 1
+    done
+    sync
+
+    state "Add devices key to /boot"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.devices.key"; do
         sleep 1
     done
     sync
@@ -104,7 +112,7 @@ cmd-install() {
     local boot_uuid
     boot_uuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* UUID=\"\([^\"]*\)\".*/\1/p')"
     if ! grep -qs "$boot_uuid" "$TARGET_DIR/etc/crypttab"; then
-        echo "boot UUID=$boot_uuid /root/.boot-keyfile luks" >>"$TARGET_DIR/etc/crypttab"
+        echo "boot UUID=$boot_uuid /root/.devices.key luks" >>"$TARGET_DIR/etc/crypttab"
     fi
     sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$TARGET_DIR/etc/fstab"
 
