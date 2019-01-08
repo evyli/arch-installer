@@ -24,20 +24,24 @@ cmd-install() {
     state "Update packages"
     pacman -Sy
 
-    state "Configure etckeeper"
-    target-install etckeeper
-    target-exec etckeeper init
-    target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
-    target-exec bash -c 'cd /etc && git config user.name "root"'
-    target-exec systemctl enable etckeeper.timer
-    target-exec etckeeper commit "After bootstrap"
+    if (( CONFIGURE_ETCKEEPER )); then
+        state "Configure etckeeper"
+        target-install etckeeper
+        target-exec etckeeper init
+        target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
+        target-exec bash -c 'cd /etc && git config user.name "root"'
+        target-exec systemctl enable etckeeper.timer
+        target-exec etckeeper commit "After bootstrap"
+    fi
 
     state "Update pacman file database"
     target-exec pacman -Fy
 
-    state "Configure pkgfile"
-    target-install pkgfile
-    target-exec pkgfile -u
+    if (( CONFIGURE_PKGFILE )); then
+        state "Configure pkgfile"
+        target-install pkgfile
+        target-exec pkgfile -u
+    fi
 
     state "Configure locales"
     target-exec sed -i 's/^/#/g' "/etc/locale.gen"
@@ -154,12 +158,16 @@ EOF
     state "Lock root account"
     target-exec passwd -l root
 
-    state "Disable reboot key combination"
-    target-exec systemctl mask ctrl-alt-del.target
+    if (( DISABLE_REBOOT_KEY )); then
+        state "Disable reboot key combination"
+        target-exec systemctl mask ctrl-alt-del.target
+    fi
 
-    state "Setup timesync"
-    target-exec systemctl enable systemd-timesyncd.service
-    target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
+    if (( CONFIGURE_SYSTEMD_TIMESYNCD )); then
+        state "Setup timesync"
+        target-exec systemctl enable systemd-timesyncd.service
+        target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
+    fi
 
     if (( CONFIGURE_SENSORS )); then
         state "Configure sensors"
@@ -179,12 +187,16 @@ EOF
         target-exec ufw enable
     fi
 
-    state "Configure mlocate"
-    target-install mlocate
-    target-exec updatedb
+    if (( CONFIGURE_MLOCATE )); then
+        state "Configure mlocate"
+        target-install mlocate
+        target-exec updatedb
+    fi
 
-    state "Etckeeper final commit"
-    target-exec etckeeper commit "After installation"
+    if (( CONFIGURE_ETCKEEPER )); then
+        state "Etckeeper final commit"
+        target-exec etckeeper commit "After installation"
+    fi
 
     category "Installation is done"
 }
