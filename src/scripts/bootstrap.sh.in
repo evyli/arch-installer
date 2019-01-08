@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+cmd-bootstrap() {
+    config-read
+
+    category "Start bootstrapping procedure"
+
+    state "Update packages"
+    pacman -Sy
+
+    state "Bootstrap system"
+    local base_packages=( # base
+                          base base-devel
+                          # maintenance
+                          polkit
+                          # boot utils
+                          btrfs-progs grub
+                          # basic user utils
+                          rsync vim git
+                          # network dependencies
+                          iw wpa_supplicant dialog wpa_actiond ifplugd
+                          # pacman utils
+                          pacman-contrib pacman-mirrorlist pkgfile)
+    pacstrap "$TARGET_DIR" "${base_packages[@]}"
+
+    category "Bootstrapping is done"
+}
+

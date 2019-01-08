@@ -24,21 +24,6 @@ cmd-install() {
     state "Update packages"
     pacman -Sy
 
-    state "Bootstrap system"
-    local base_packages=( # base
-                          base base-devel
-                          # maintenance
-                          polkit
-                          # boot utils
-                          btrfs-progs grub
-                          # basic user utils
-                          rsync vim git
-                          # network dependencies
-                          iw wpa_supplicant dialog wpa_actiond ifplugd
-                          # pacman utils
-                          pacman-contrib pacman-mirrorlist pkgfile)
-    pacstrap "$TARGET_DIR" "${base_packages[@]}"
-
     state "Update pacman file database"
     target-exec pacman -Fy
 
@@ -77,7 +62,6 @@ cmd-install() {
       echo "ff02::2 ip6-allrouters"; } >>"$TARGET_DIR/etc/hosts"
 
     state "Configure sudo"
-    target-install "sudo"
     echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
 
     state "Configure mkinitcpio hooks"

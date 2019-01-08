@@ -19,6 +19,7 @@ the encrypted partitions and configure *Arch* to boot those.
       2. > ~livedisk-init~ (optional)
       3. > ~disk-partition~
       4. > ~mount~
+      5. > ~bootstrap~
       5. > ~install~
       6. > ~chroot~ (optional: you can inspect the installed system)
       7. > ~umount~

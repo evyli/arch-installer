@@ -25,6 +25,7 @@ usage: $0 <cmd>
 Commands:
     chroot
     disk-partition
+    bootstrap
     install
     livedisk-init
     livedisk-increase-cowspace-size
@@ -44,6 +45,7 @@ shift 1 || true
 case "${cmd:-}" in
     chroot)                             cmd-chroot "$@";;
     disk-partition)                     cmd-disk-partition "$@";;
+    bootstrap)                          cmd-bootstrap "$@";;
     install)                            cmd-install "$@";;
     livedisk-init)                      cmd-livedisk-init "$@";;
     livedisk-increase-cowspace-size)    cmd-livedisk-increase-cowspace-size "$@";;
