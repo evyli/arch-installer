@@ -38,6 +38,8 @@ cmd-install() {
                           polkit
                           # hardware utils
                           lm_sensors
+                          # firewall
+                          ufw ufw-extras
                           # boot utils
                           btrfs-progs grub
                           # basic user utils
@@ -174,6 +176,11 @@ EOF
     while ! target-exec sensors-detect; do
         sleep 1
     done
+
+    state "Configure firewall"
+    target-exec ufw enable
+    target-exec ufw default deny incoming
+    target-exec ufw default allow outgoing
 
     category "Installation is done"
 }
