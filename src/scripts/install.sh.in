@@ -37,12 +37,6 @@ cmd-install() {
     state "Update pacman file database"
     target-exec pacman -Fy
 
-    if (( CONFIGURE_PKGFILE )); then
-        state "Configure pkgfile"
-        target-install pkgfile
-        target-exec pkgfile -u
-    fi
-
     state "Configure locales"
     target-exec sed -i 's/^/#/g' "/etc/locale.gen"
     for locale in "${LOCALES[@]}"; do
@@ -194,6 +188,12 @@ EOF
         state "Configure mlocate"
         target-install mlocate
         target-exec updatedb
+    fi
+
+    if (( CONFIGURE_PKGFILE )); then
+        state "Configure pkgfile"
+        target-install pkgfile
+        target-exec pkgfile -u
     fi
 
     if (( CONFIGURE_ETCKEEPER )); then
