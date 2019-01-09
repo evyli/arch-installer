@@ -90,13 +90,19 @@ cmd-install() {
     target-exec mkinitcpio -p linux
 
     state "Configure grub"
+    local quiet_cmdline
+    if (( QUIET_BOOT )); then
+        quiet_cmdline="quiet "
+    else
+        quiet_cmdline=""
+    fi
     local mainpartition_partuuid
     mainpartition_partuuid="$(blkid "${DEVICE}$MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
     target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 2
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "false"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 0
-    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"quiet cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
+    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
     mkdir "$TARGET_DIR/boot/grub"
