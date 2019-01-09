@@ -300,33 +300,30 @@ kernel.dmesg_restrict = 1
 EOF
     fi
 
-    if (( CONFIGURE_DNSMASQ )); then
-        state "Configure dnsmasq"
-        target-install dnsmasq ldns
+    if (( CONFIGURE_DNSCACHE )); then
+        state "Configure unbound"
+        target-install unbound expat ldns bind-tools
 
-        # Configure dnsmasq.conf
-        target-exec systemctl enable dnsmasq
-        target-config-set-entry "/etc/dnsmasq.conf" "listen-address" "::1,127.0.0.1"
-        target-config-set-entry "/etc/dnsmasq.conf" "cache-size" "1000"
-        target-config-set-entry "/etc/dnsmasq.conf" "conf-file" "/usr/share/dnsmasq/trust-anchors.conf"
-        sed -i "s/^#dnssec$/dnssec/g" "$TARGET_DIR/etc/dnsmasq.conf"
-        sed -i "s/^#no-resolv$/no-resolv/g" "$TARGET_DIR/etc/dnsmasq.conf"
-        sed -i "s/^#dnssec-check-unsigned$/dnssec-check-unsigned/g" "$TARGET_DIR/etc/dnsmasq.conf"
+        cat >> "$TARGET_DIR/etc/unbound/unbound.conf" <<EOF
+forward-zone:
+    name "."
+EOF
 
-        if [[ "$DNSMASQ_SERVER1" = "" ]]; then
+        if [[ "$DNS_SERVER1" = "" ]]; then
             # Default
-            DNSMASQ_SERVER1=1.1.1.1
+            DNS_SERVER1=1.1.1.1
         fi
 
-        echo "server=$DNSMASQ_SERVER1" >> "$TARGET_DIR/etc/dnsmasq.conf"
+        echo "    forward-addr: $DNS_SERVER1" >> "$TARGET_DIR/etc/unbound/unbound.conf"
 
-        if [[ "$DNSMASQ_SERVER2" != "" ]]; then
-            echo "server=$DNSMASQ_SERVER2" >> "$TARGET_DIR/etc/dnsmasq.conf"
+        if [[ "$DNS_SERVER2" != "" ]]; then
+        echo "    forward-addr: $DNS_SERVER2" >> "$TARGET_DIR/etc/unbound/unbound.conf"
         fi
 
-        if [[ "$DNSMASQ_SERVER3" != "" ]]; then
-            echo "server=$DNSMASQ_SERVER3" >> "$TARGET_DIR/etc/dnsmasq.conf"
+        if [[ "$DNS_SERVER3" != "" ]]; then
+        echo "    forward-addr: $DNS_SERVER3" >> "$TARGET_DIR/etc/unbound/unbound.conf"
         fi
+        
 
         # Configure resolv.conf
         echo -e "nameserver ::1\nnameserver 127.0.0.1" >> "$TARGET_DIR/etc/resolv.conf"
