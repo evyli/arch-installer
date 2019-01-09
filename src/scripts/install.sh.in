@@ -94,6 +94,9 @@ cmd-install() {
     fi
     sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$TARGET_DIR/etc/fstab"
 
+    state "Make /boot only readable by root"
+    chmod 700 "$TARGET_DIR/boot"
+
     state "Build kernel image"
     target-exec mkinitcpio -p linux
 
