@@ -79,11 +79,11 @@ cmd-install() {
     chmod 700 "$TARGET_DIR/root/.luks"
 
     state "Create / keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=4096 count=8192
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=1024 count=8192
     chmod 0400 "$TARGET_DIR/root/.luks/root.key"
 
     state "Create /boot keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=4096 count=8192
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=1024 count=8192
     chmod 0400 "$TARGET_DIR/root/.luks/boot.key"
 
     state "Configure /boot to be mounted via crypttab"
