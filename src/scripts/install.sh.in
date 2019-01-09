@@ -241,11 +241,12 @@ EOF
         state "Configure dnsmasq"
         target-install dnsmasq
         target-exec systemctl enable dnsmasq
-        target-config-set-entry "/etc/dnsmasq.conf" "port" "0"
         target-config-set-entry "/etc/dnsmasq.conf" "listen-address" "::1,127.0.0.1"
         target-config-set-entry "/etc/dnsmasq.conf" "cache-size" "1000"
         target-config-set-entry "/etc/dnsmasq.conf" "conf-file" "/usr/share/dnsmasq/trust-anchors.conf"
-        target-config-set-entry "/etc/dnsmasq.conf" "dnssec" ""
+        sed -i "s/^#dnssec$/dnssec/g" "/etc/dnsmasq.conf"
+        target-config-set-entry "/etc/resolvconf.conf" "name_servers" "127.0.0.1"
+        egrep -q "nameserver" "$TARGET_DIR/etc/resolv.conf" || echo "nameserver 127.0.0.1" >> "$TARGET_DIR/etc/resolv.conf"
     fi
 
     if (( CONFIGURE_ETCKEEPER )); then
