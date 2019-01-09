@@ -74,15 +74,23 @@ cmd-install() {
     state "Configure mkinitcpio hooks"
     target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt lvm2 resume filesystems fsck\""
 
-    state "Create devices keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.devices.key" bs=1024 count=8192
-    chmod 0400 "$TARGET_DIR/root/.devices.key"
+    state "Create /root/.luks folder"
+    mkdir -p "$TARGET_DIR/root/.luks"
+    chmod 700 "$TARGET_DIR/root/.luks"
+
+    state "Create / keyfile"
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=4096 count=8192
+    chmod 0400 "$TARGET_DIR/root/.luks/root.key"
+
+    state "Create /boot keyfile"
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=4096 count=8192
+    chmod 0400 "$TARGET_DIR/root/.luks/boot.key"
 
     state "Configure /boot to be mounted via crypttab"
     local boot_uuid
     boot_uuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* UUID=\"\([^\"]*\)\".*/\1/p')"
     if ! grep -qs "$boot_uuid" "$TARGET_DIR/etc/crypttab"; then
-        echo "boot UUID=$boot_uuid /root/.devices.key luks" >>"$TARGET_DIR/etc/crypttab"
+        echo "boot UUID=$boot_uuid /root/.luks/boot.key luks" >>"$TARGET_DIR/etc/crypttab"
     fi
     sed -i '/boot/ s#^UUID=[0-9a-fA-F-]*#/dev/mapper/boot#g' "$TARGET_DIR/etc/fstab"
 
@@ -122,10 +130,9 @@ EOF
     state "Install grub"
     target-exec grub-install --target=i386-pc --recheck "$DEVICE" --modules="part_gpt part_msdos"
 
-    state "Backup the luksheaders to /root/.backups"
-    mkdir -p "$TARGET_DIR/root/.backups"
-    cryptsetup luksHeaderBackup "${DEVICE}$MAIN_PARTITION" --header-backup-file "$TARGET_DIR/root/.backups/root.luksheader"
-    cryptsetup luksHeaderBackup "${DEVICE}$BOOT_PARTITION" --header-backup-file "$TARGET_DIR/root/.backups/boot.luksheader"
+    state "Backup the luksheaders to /root/.luks"
+    cryptsetup luksHeaderBackup "${DEVICE}$MAIN_PARTITION" --header-backup-file "$TARGET_DIR/root/.luks/root.luksheader"
+    cryptsetup luksHeaderBackup "${DEVICE}$BOOT_PARTITION" --header-backup-file "$TARGET_DIR/root/.luks/boot.luksheader"
 
     if [[ "$ETH_INTERFACE" != "" ]]; then
         state "Setup ifplugd Ethernet"
@@ -139,13 +146,13 @@ EOF
     fi
 
     state "Add devices key to /"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.devices.key"; do
+    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.luks/root.key"; do
         sleep 1
     done
     sync
 
     state "Add devices key to /boot"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.devices.key"; do
+    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.luks/boot.key"; do
         sleep 1
     done
     sync
