@@ -116,8 +116,8 @@ cmd-install() {
     target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
-    mkdir "$TARGET_DIR/boot/grub"
-    mkdir "$TARGET_DIR/hostlvm"
+    mkdir -p "$TARGET_DIR/boot/grub"
+    mkdir -p "$TARGET_DIR/hostlvm"
     mount --bind /run/lvm "$TARGET_DIR/hostlvm"
     cat > "$TARGET_DIR/configure-grub.sh" <<EOF
 #!/bin/bash
