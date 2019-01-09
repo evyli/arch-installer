@@ -327,7 +327,6 @@ EOF
         
         # Configure resolv.conf
         target-config-set-entry "/etc/resolvconf.conf" "name_servers" "\"::1 127.0.0.1\""
-        target-exec "resolvconf -u"
     fi
 
     if (( CONFIGURE_ETCKEEPER )); then
