@@ -231,6 +231,12 @@ EOF
         target-exec pkgfile -u
     fi
 
+    if (( CONFIGURE_IRQBALANCE )); then
+        state "Configure irqbalance"
+        target-install irqbalance
+        target-exec systemctl enable irqbalance
+    fi
+
     if (( CONFIGURE_ETCKEEPER )); then
         state "Etckeeper final commit"
         target-exec etckeeper commit "After installation"
