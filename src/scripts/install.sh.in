@@ -248,6 +248,7 @@ EOF
         target-config-set-entry "/etc/dnsmasq.conf" "conf-file" "/usr/share/dnsmasq/trust-anchors.conf"
         sed -i "s/^#dnssec$/dnssec/g" "$TARGET_DIR/etc/dnsmasq.conf"
         sed -i "s/^#no-resolv$/no-resolv/g" "$TARGET_DIR/etc/dnsmasq.conf"
+        sed -i "s/^#dnssec-check-unsigned$/dnssec-check-unsigned/g" "$TARGET_DIR/etc/dnsmasq.conf"
 
         if [[ "$DNSMASQ_SERVER1" = "" ]]; then
             # Default
