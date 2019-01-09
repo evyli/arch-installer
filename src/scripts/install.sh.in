@@ -239,7 +239,7 @@ EOF
 
     if (( CONFIGURE_DNSMASQ )); then
         state "Configure dnsmasq"
-        target-install dnsmasq
+        target-install dnsmasq ldns
         target-exec systemctl enable dnsmasq
         target-config-set-entry "/etc/dnsmasq.conf" "listen-address" "::1,127.0.0.1"
         target-config-set-entry "/etc/dnsmasq.conf" "cache-size" "1000"
