@@ -42,7 +42,7 @@ target-config-set-entry() {
     # Uncomment line if line exists only commented
     egrep -q "^$key\s*$sep\s*.*\$" "$file" || sed -i "0,/^#\s*$key\s*$sep\s*.*\$/ s/^#\s*\($key\s*$sep\s*.*\$\)/\1/" "$file"
     # Replace entry. Otherwise: append the entry to the file
-    egrep -q "^$key\s*$sep\s*.*\$" "$file" && sed -i "0,/^$key\s*$sep\s*.*\$/ s/^\($key\s*$sep\s*\).*\$/\1$value/" "$file" || echo "\n$2$sep$3" >> "$file"
+    egrep -q "^$key\s*$sep\s*.*\$" "$file" && sed -i "0,/^$key\s*$sep\s*.*\$/ s/^\($key\s*$sep\s*\).*\$/\1$value/" "$file" || echo -e "\n$2$sep$3" >> "$file"
 }
 
 trim() {
