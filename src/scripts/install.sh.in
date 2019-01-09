@@ -153,10 +153,10 @@ EOF
     if [[ "$AUTOLOGIN" != "" ]]; then
         state "Configure auto login on $AUTOLOGIN"
         mkdir -p "$TARGET_DIR/etc/systemd/system/getty@$AUTOLOGIN.service.d"
-        cat > "$TARGET_DIR/etc/systemd/system/getty@$AUTOLOGIN.service.d/override.conf" <<'EOF'
+        cat > "$TARGET_DIR/etc/systemd/system/getty@$AUTOLOGIN.service.d/autologin.conf" <<EOF
 [Service]
 ExecStart=
-ExecStart=-/usr/bin/agetty --autologin username --noclear %I $TERM
+ExecStart=-/usr/bin/agetty --autologin $USER --noclear %I \$TERM
 EOF
     fi
 
@@ -168,7 +168,7 @@ EOF
     if (( DO_NOT_CLEAR_TTY1 )); then
         state "Do not clear tty1 on boot"
         mkdir -p "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d"
-        cat > "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d/noclear.conf" <<'EOF'
+        cat > "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d/noclear.conf" <<EOF
 [Service]
 TTYVTDisallocate=no
 EOF
