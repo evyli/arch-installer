@@ -165,6 +165,15 @@ EOF
 
     category "Configure optional features"
 
+    if (( DO_NOT_CLEAR_TTY1 )); then
+        state "Do not clear tty1 on boot"
+        mkdir -p "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d
+        cat > "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d/noclear.conf" <<'EOF'
+[Service]
+TTYVTDisallocate=no
+EOF
+    fi
+
     if (( DISABLE_REBOOT_KEY )); then
         state "Disable reboot key combination"
         target-exec systemctl mask ctrl-alt-del.target
