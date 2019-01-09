@@ -30,7 +30,7 @@ cmd-install() {
         target-exec etckeeper init
         target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
         target-exec bash -c 'cd /etc && git config user.name "root"'
-        target-exec systemctl enable etckeeper.timer
+        target-enable etckeeper.timer
         target-exec etckeeper commit "After bootstrap"
     fi
 
@@ -139,13 +139,13 @@ EOF
 
     if [[ "$ETH_INTERFACE" != "" ]]; then
         state "Setup ifplugd Ethernet"
-        target-exec systemctl enable "netctl-ifplugd@$ETH_INTERFACE.service"
+        target-enable "netctl-ifplugd@$ETH_INTERFACE.service"
         cp "$TARGET_DIR/etc/netctl/examples/ethernet-dhcp" "$TARGET_DIR/etc/netctl/eth"
         sed -i "s/eth0/$ETH_INTERFACE/g" "$TARGET_DIR/etc/netctl/eth"
     fi
     if [[ "$WIFI_INTERFACE" != "" ]]; then
         state "Setup auto Wifi"
-        target-exec systemctl enable "netctl-auto@$WIFI_INTERFACE.service"
+        target-enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
 
     state "Add devices key to /"
@@ -197,7 +197,7 @@ EOF
 
     if (( CONFIGURE_SYSTEMD_TIMESYNCD )); then
         state "Setup timesync"
-        target-exec systemctl enable systemd-timesyncd.service
+        target-enable systemd-timesyncd.service
         target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
     fi
 
@@ -213,7 +213,7 @@ EOF
     if (( CONFIGURE_FIREWALL )); then
         state "Configure firewall"
         target-install ufw ufw-extras
-        target-exec systemctl enable ufw
+        target-enable ufw
         target-exec ufw default deny incoming
         target-exec ufw default allow outgoing
         target-exec ufw enable
@@ -234,7 +234,7 @@ EOF
     if (( CONFIGURE_IRQBALANCE )); then
         state "Configure irqbalance"
         target-install irqbalance
-        target-exec systemctl enable irqbalance
+        target-enable irqbalance
     fi
 
     if (( CONFIGURE_SYSCTL )); then

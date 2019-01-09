@@ -31,6 +31,12 @@ target-install() {
     target-exec pacman --needed -S --noconfirm "$@"
 }
 
+target-enable() {
+    for service in "$@"; do
+        target-exec systemctl enable "$service"
+    done
+}
+
 target-config-set-entry() {
     local file="$TARGET_DIR/$1"
     local key
