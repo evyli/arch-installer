@@ -20,7 +20,7 @@
 write-encrypt-hook() {
     config-read
 
-    cat > "$TARGET_DIR/etc/initcpio/hooks/encrypt2" <<'EOF'
+    cat > "$TARGET_DIR/etc/initcpio/hooks/encrypt2" <<'EOF2'
 #!/usr/bin/ash
 
 run_hook() {
@@ -171,14 +171,14 @@ EOF
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
-EOF
+EOF2
 }
 
 # The encrypt2 install is based on the encrypt install provided by ArchLinux 
 write-encrypt-install() {
     config-read
 
-    cat > "$TARGET_DIR/etc/initcpio/install/encrypt2" <<'EOF'
+    cat > "$TARGET_DIR/etc/initcpio/install/encrypt2" <<'EOF2'
 #!/bin/bash
 
 build() {
@@ -229,5 +229,5 @@ HELPEOF
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
-EOF
+EOF2
 }
