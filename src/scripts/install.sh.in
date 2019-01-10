@@ -302,7 +302,7 @@ EOF
 
     if (( CONFIGURE_DNSCACHE )); then
         state "Configure unbound"
-        target-install unbound expat openresolv ldns bind-tools
+        target-install unbound expat openresolv
         target-enable unbound
 
         cat >> "$TARGET_DIR/etc/unbound/unbound.conf" <<EOF

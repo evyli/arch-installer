@@ -31,13 +31,16 @@ cmd-bootstrap() {
                           polkit
                           # boot utils
                           btrfs-progs grub
-                          # basic user utils
-                          rsync vim git
                           # network dependencies
                           iw wpa_supplicant dialog wpa_actiond ifplugd
                           # pacman utils
                           pacman-contrib pacman-mirrorlist)
     pacstrap "$TARGET_DIR" "${base_packages[@]}"
+
+    if (( INSTALL_UTILS )); then
+        state "Install utils"
+        target-install "${UTILS[@]}"
+    fi
 
     category "Bootstrapping is done"
 }
