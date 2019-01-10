@@ -37,9 +37,9 @@ cmd-bootstrap() {
                           pacman-contrib pacman-mirrorlist)
     pacstrap "$TARGET_DIR" "${base_packages[@]}"
 
-    if (( INSTALL_UTILS )); then
-        state "Install utils"
-        target-install "${UTILS[@]}"
+    if [ -n "$INSTALL_PACKAGES" ]; then
+        state "Install packages"
+        target-install "${INSTALL_PACKAGES[@]}"
     fi
 
     category "Bootstrapping is done"
