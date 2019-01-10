@@ -24,16 +24,6 @@ cmd-install() {
     state "Update packages"
     pacman -Sy
 
-    if (( CONFIGURE_ETCKEEPER )); then
-        state "Configure etckeeper"
-        target-install etckeeper
-        target-exec etckeeper init
-        target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
-        target-exec bash -c 'cd /etc && git config user.name "root"'
-        target-enable etckeeper.timer
-        target-exec etckeeper commit "After bootstrap"
-    fi
-
     state "Update pacman file database"
     target-exec pacman -Fy
 
@@ -166,6 +156,11 @@ EOF
         sleep 1
     done
 
+    state "Lock root account"
+    target-exec passwd -l root
+
+    category "Configure optional features"
+
     if [[ "$AUTOLOGIN" != "" ]]; then
         state "Configure auto login on $AUTOLOGIN"
         mkdir -p "$TARGET_DIR/etc/systemd/system/getty@$AUTOLOGIN.service.d"
@@ -175,11 +170,6 @@ ExecStart=
 ExecStart=-/usr/bin/agetty --autologin $USER --noclear %I \$TERM
 EOF
     fi
-
-    state "Lock root account"
-    target-exec passwd -l root
-
-    category "Configure optional features"
 
     if (( DO_NOT_CLEAR_TTY1 )); then
         state "Do not clear tty1 on boot"
@@ -330,8 +320,13 @@ EOF
     fi
 
     if (( CONFIGURE_ETCKEEPER )); then
-        state "Etckeeper final commit"
-        target-exec etckeeper commit "After installation"
+        state "Configure etckeeper"
+        target-install etckeeper
+        target-exec etckeeper init
+        target-exec bash -c 'cd /etc && git config user.email "root@localhost"'
+        target-exec bash -c 'cd /etc && git config user.name "root"'
+        target-enable etckeeper.timer
+        target-exec etckeeper commit "Complete system installation"
     fi
 
     category "Installation is done"
