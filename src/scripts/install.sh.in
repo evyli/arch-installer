@@ -79,6 +79,7 @@ cmd-install() {
     state "Create / keyfile"
     dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=1024 count=8192
     chmod 0400 "$TARGET_DIR/root/.luks/root.key"
+    cp "$TARGET_DIR/root/.luks/root.key" "$TARGET_DIR/boot/root.key"
 
     state "Create /boot keyfile"
     dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=1024 count=8192
@@ -107,11 +108,13 @@ cmd-install() {
     fi
     local mainpartition_partuuid
     mainpartition_partuuid="$(blkid "${DEVICE}$MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
+    local bootpartition_partuuid
+    bootpartition_partuuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
     target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 10
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "true"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 1
-    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
+    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux cryptkey=/dev/disk/by-partuuid/$bootpartition_partuuid:auto:/root.key root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
     mkdir -p "$TARGET_DIR/boot/grub"
