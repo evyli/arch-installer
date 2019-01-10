@@ -97,7 +97,7 @@ cmd-install() {
     mainpartition_partuuid="$(blkid "${DEVICE}$MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
     local bootpartition_partuuid
     bootpartition_partuuid="$(blkid "${DEVICE}$BOOT_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
-    target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 10
+    target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 0
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "true"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 1
