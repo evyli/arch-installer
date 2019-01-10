@@ -99,10 +99,10 @@ cmd-install() {
     fi
     local mainpartition_partuuid
     mainpartition_partuuid="$(blkid "${DEVICE}$MAIN_PARTITION" | sed -n 's/.* PARTUUID=\"\([^\"]*\)\".*/\1/p')"
-    target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 2
+    target-config-set-entry "/etc/default/grub" "GRUB_TIMEOUT" 10
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
-    target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "false"
-    target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 0
+    target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "true"
+    target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 1
     target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
@@ -171,7 +171,7 @@ ExecStart=-/usr/bin/agetty --autologin $USER --noclear %I \$TERM
 EOF
     fi
 
-    if (( DO_NOT_CLEAR_TTY1 )); then
+    if (( ! CLEAR_TTY1 )); then
         state "Do not clear tty1 on boot"
         mkdir -p "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d"
         cat > "$TARGET_DIR/etc/systemd/system/getty@tty1.service.d/noclear.conf" <<EOF
