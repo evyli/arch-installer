@@ -29,8 +29,8 @@ cmd-umount() {
     fi
 
     if grep -qs "partition" "/proc/swaps"; then
-        state "Deactivate swap partition"
-        swapoff "/dev/archlinux/swap"
+        state "Deactivate swap partition (if used)"
+        swapoff "/dev/archlinux/swap" >/dev/null 2>/dev/null || true
     fi
 
     state "Try to remove LVM volumes"

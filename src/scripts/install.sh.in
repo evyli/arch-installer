@@ -48,6 +48,14 @@ cmd-install() {
     state "Configure hardware clock"
     target-exec hwclock --systohc --utc
 
+    if (( USE_SWAP )); then
+        if ! grep -qs "partition" "/proc/swaps"; then
+            if swapon "/dev/archlinux/swap"; then
+                state "Activated swap partition"
+            fi
+        fi
+    fi
+
     state "Generate fstab"
     genfstab -U "$TARGET_DIR" > "$TARGET_DIR/etc/fstab"
 
