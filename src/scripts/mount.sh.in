@@ -73,5 +73,11 @@ cmd-mount() {
         mount -o nodev,nosuid,size=4G "tmpfs" "$TARGET_DIR/tmp" -t tmpfs
     fi
 
+    if ! grep -qs "partition" "/proc/swaps"; then
+        if swapon "/dev/archlinux/swap"; then
+            state "Activated swap partition"
+        fi
+    fi
+
     category "Mounting system is done"
 }
