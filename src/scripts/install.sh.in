@@ -68,12 +68,12 @@ cmd-install() {
         encrypt_hook_name="encrypt"
     fi
 
-    state "Configure mkinitcpio hooks"
-    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont ${encrypt_hook_name} lvm2 resume filesystems fsck\""
-
     state "Add custom initcpio hooks"
     write-encrypt-hook
     write-encrypt-install
+
+    state "Configure mkinitcpio hooks"
+    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont ${encrypt_hook_name} lvm2 resume filesystems fsck\""
 
     state "Create /root/.luks folder"
     mkdir -p "$TARGET_DIR/root/.luks"
