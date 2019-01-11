@@ -69,8 +69,15 @@ cmd-install() {
     state "Configure sudo"
     echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
 
+    local encrypt_hook_name
+    if (( ENCRYPT_ROOT_WITH_KEYFILE )); then
+        encrypt_hook_name="encrypt-keyfile"
+    else
+        encrypt_hook_name="encrypt"
+    fi
+
     state "Configure mkinitcpio hooks"
-    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt-keyfile lvm2 resume filesystems fsck\""
+    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont ${encrypt_hook_name} lvm2 resume filesystems fsck\""
 
     state "Add custom initcpio hooks"
     write-encrypt-hook
