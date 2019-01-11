@@ -347,6 +347,25 @@ EOF
         target-config-set-entry "/etc/resolvconf.conf" "name_servers" "\"::1 127.0.0.1\""
     fi
 
+    if (( CONFIGURE_SSH )); then
+        state "Configure openssh"
+        target-install openssh
+        target-exec ufw allow ssh
+        target-enable sshd
+        echo "PermitRootLogin no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "PasswordAuthentication no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "AllowUsers $USER" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "LoginGraceTime 60" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "MaxStartups 8" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "AllowTcpForwarding no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "PermitEmptyPasswords no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "ClientAliveInterval 300" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "ClientAliveCountMax 0" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "X11Forwarding no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "Port $SSHD_PORT" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        chmod 600 "$TARGET_DIR/etc/ssh/sshd_config"
+    fi
+
     if (( CONFIGURE_ETCKEEPER )); then
         state "Configure etckeeper"
         target-install etckeeper
