@@ -226,12 +226,6 @@ EOF
         fi
     fi
 
-    if (( CONFIGURE_MLOCATE )); then
-        state "Configure mlocate"
-        target-install mlocate
-        target-exec updatedb
-    fi
-
     if (( CONFIGURE_PKGFILE )); then
         state "Configure pkgfile"
         target-install pkgfile
@@ -361,6 +355,12 @@ EOF
         echo "X11Forwarding no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "Port $SSHD_PORT" >> "$TARGET_DIR/etc/ssh/sshd_config"
         chmod 600 "$TARGET_DIR/etc/ssh/sshd_config"
+    fi
+
+    if (( CONFIGURE_MLOCATE )); then
+        state "Configure mlocate"
+        target-install mlocate
+        target-exec updatedb
     fi
 
     if (( CONFIGURE_ETCKEEPER )); then
