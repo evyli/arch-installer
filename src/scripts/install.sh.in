@@ -348,7 +348,7 @@ EOF
     if (( CONFIGURE_SSH )); then
         state "Configure openssh"
         target-install openssh
-        target-exec ufw allow ssh
+        target-exec ufw allow "$SSHD_PORT" comment "sshd"
         target-enable sshd
         echo "PermitRootLogin no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "PasswordAuthentication no" >> "$TARGET_DIR/etc/ssh/sshd_config"
