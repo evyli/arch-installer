@@ -27,6 +27,8 @@ cmd-bootstrap() {
     state "Bootstrap system"
     local base_packages=( # base
                           base base-devel
+                          # kernel
+                          linux-hardened
                           # maintenance
                           polkit
                           # boot utils

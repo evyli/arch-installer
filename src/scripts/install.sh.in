@@ -180,6 +180,9 @@ EOF
     state "Lock root account"
     target-exec passwd -l root
 
+    state "Set default umask to 027 (077 too restrictive)"
+    sed -i 's/umask 022/umask 027/g' "$TARGET_DIR/etc/profile"
+
     category "Configure optional features"
 
     if [[ "$AUTOLOGIN" != "" ]]; then
@@ -254,6 +257,8 @@ EOF
 
         # Network tuning
         cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
+net.core.bpf_jit_enable = 0
+
 net.core.netdev_max_backlog = 100000
 net.core.netdev_budget = 50000
 net.core.netdev_budget_usecs = 5000
@@ -297,6 +302,8 @@ net.ipv6.conf.all.accept_redirects = 0
 net.ipv6.conf.default.accept_redirects = 0
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.default.send_redirects = 0
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+net.ipv4.ip_forward=0
 EOF
 
         # Disk
