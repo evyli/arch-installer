@@ -129,7 +129,7 @@ cmd-install() {
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "true"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 1
-    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[@]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
+    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[0]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
 
     state "Generate grub configuration"
     mkdir -p "$TARGET_DIR/boot/grub"
