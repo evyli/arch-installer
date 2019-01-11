@@ -70,11 +70,35 @@ cmd-install() {
     echo "%wheel ALL=(ALL) ALL" >"$TARGET_DIR/etc/sudoers.d/wheel"
 
     state "Configure mkinitcpio hooks"
-    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt2 lvm2 resume filesystems fsck\""
+    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont encrypt-keyfile lvm2 resume filesystems fsck\""
 
     state "Add custom initcpio hooks"
     write-encrypt-hook
     write-encrypt-install
+
+    state "Create /root/.luks folder"
+    mkdir -p "$TARGET_DIR/root/.luks"
+    chmod 700 "$TARGET_DIR/root/.luks"
+
+    state "Create / keyfile"
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=1024 count=8192
+    chmod 0400 "$TARGET_DIR/root/.luks/root.key"
+
+    state "Add devices key to /"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.luks/root.key"; do
+        sleep 1
+    done
+    sync
+
+    state "Create /boot keyfile"
+    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=1024 count=8192
+    chmod 0400 "$TARGET_DIR/root/.luks/boot.key"
+
+    state "Add devices key to /boot"
+    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.luks/boot.key"; do
+        sleep 1
+    done
+    sync
 
     state "Configure /boot to be mounted via crypttab"
     local boot_uuid
@@ -139,30 +163,6 @@ EOF
         state "Setup auto Wifi"
         target-enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
-
-    state "Create /root/.luks folder"
-    mkdir -p "$TARGET_DIR/root/.luks"
-    chmod 700 "$TARGET_DIR/root/.luks"
-
-    state "Create / keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/root.key" bs=1024 count=8192
-    chmod 0400 "$TARGET_DIR/root/.luks/root.key"
-
-    state "Add devices key to /"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$MAIN_PARTITION" "$TARGET_DIR/root/.luks/root.key"; do
-        sleep 1
-    done
-    sync
-
-    state "Create /boot keyfile"
-    dd if=/dev/urandom of="$TARGET_DIR/root/.luks/boot.key" bs=1024 count=8192
-    chmod 0400 "$TARGET_DIR/root/.luks/boot.key"
-
-    state "Add devices key to /boot"
-    while ! eval cryptsetup luksAddKey "${DEVICE}$BOOT_PARTITION" "$TARGET_DIR/root/.luks/boot.key"; do
-        sleep 1
-    done
-    sync
 
     state "Create user account"
     target-exec useradd -m -G "users,$USERGROUPS" "$USER"

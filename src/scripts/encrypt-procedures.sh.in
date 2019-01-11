@@ -20,7 +20,7 @@
 write-encrypt-hook() {
     config-read
 
-    cat > "$TARGET_DIR/etc/initcpio/hooks/encrypt2" <<'EOF2'
+    cat > "$TARGET_DIR/etc/initcpio/hooks/encrypt-keyfile" <<'EOF2'
 #!/usr/bin/ash
 
 run_hook() {
@@ -105,6 +105,8 @@ EOF
             # Try to use the hardcoded keyfile before asking for passphrase
             if eval cryptsetup --key-file "/root/root.key" open --type luks ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; then
                 dopassphrase=0
+            else
+                echo "Invalid keyfile or keyfile not found. Reverting to passphrase."
             fi
 
             # Ask for a passphrase
@@ -178,7 +180,7 @@ EOF2
 write-encrypt-install() {
     config-read
 
-    cat > "$TARGET_DIR/etc/initcpio/install/encrypt2" <<'EOF2'
+    cat > "$TARGET_DIR/etc/initcpio/install/encrypt-keyfile" <<'EOF2'
 #!/bin/bash
 
 build() {
