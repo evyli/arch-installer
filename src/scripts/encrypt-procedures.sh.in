@@ -105,7 +105,7 @@ EOF
             # Try to use the hardcoded keyfile before asking for passphrase
             if [ -f "/root/root.key" ]; then
                 echo -n "Unlocking root with installed keyfile..."
-                if eval cryptsetup --key-file "/root/root.key" open --type luks ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; then
+                if eval cryptsetup --key-file "/root/root.key" open --type luks ${resolved} ${cryptname} ${cryptargs} ${CSQUIET} >/dev/null 2>/dev/null; then
                     echo "done."
                     dopassphrase=0
                 else
