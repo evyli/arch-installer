@@ -13,16 +13,25 @@ This repository contains my *ArchLinux* installer which considers some security 
 * Install
 
 1. Call the installer with no arguments or with the argument ~help~ to see the supported commands.
-2. Run the commands:
-      1. Modify the provided configuration file
-      2. > ~livedisk-init~ (optional)
-      3. > ~disk-partition~
-      4. > ~mount~
-      5. > ~bootstrap~
+2. Modify the provided configuration file
+3. Run the commands:
+      1. > ~livedisk-init~ (optional)
+      2. > ~disk-partition~
+      3. > ~mount~
+      4. > ~bootstrap~
       5. > ~install~
       6. > ~chroot~ (optional: you can inspect the installed system)
       7. > ~umount~
       8. Reboot into the new system
+
+* Inspect the system later
+
+Run the commands:
+
+1. > ~livedisk-init~ (optional)
+2. > ~mount~
+3. > ~chroot~
+4. > ~umount~
 
 * License
 Copyright (C)  2017 nyshria

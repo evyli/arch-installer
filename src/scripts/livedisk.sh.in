@@ -41,8 +41,3 @@ cmd-livedisk-init() {
         pacman -Sy
     fi
 }
-
-cmd-livedisk-increase-cowspace-size() {
-    category "Resizing livedisk cowspace"
-    mount -o size=1G,remount /run/archiso/cowspace
-}

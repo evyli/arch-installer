@@ -22,16 +22,30 @@ help() {
     cat << EOF
 usage: $0 <cmd>
 
-Commands:
-    chroot
-    disk-partition
-    bootstrap
-    install
-    livedisk-init
-    livedisk-increase-cowspace-size
-    mount
-    umount
-    help
+Preparations:
+  1. Increase the cowspace size on the livedisk: 'mount -o size=1G,remount /run/archiso/cowspace'
+  2. Install required packages: 'pacman -Sy && pacman -S pacman-contrib git make m4'
+  3. Pull the repository: 'git clone https://github.com/nyshria/arch-installer.git'
+  4. Run 'make' inside the repository
+
+Install:
+  1. Modify the provided configuration file
+  2. Run the commands:
+    1. > 'livedisk-init' (optional)
+    2. > 'disk-partition'
+    3. > 'mount'
+    4. > 'bootstrap'
+    5. > 'install'
+    6. > 'chroot' (optional: you can inspect the installed system)
+    7. > 'umount'
+    8. Reboot into the new system
+
+Inspect the system later:
+  Run the commands:
+    1. > 'livedisk-init' (optional)
+    2. > 'mount'
+    3. > 'chroot'
+    4. > 'umount'
 
 Copyright (C) 2017  nyshria <nyshria@member.fsf.org>
 This program comes with ABSOLUTELY NO WARRANTY.
