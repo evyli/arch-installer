@@ -243,7 +243,7 @@ EOF
         echo "" > "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf"
 
         # Network tuning
-        cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/50-network.conf" <<EOF
 net.core.netdev_max_backlog = 100000
 net.core.netdev_budget = 50000
 net.core.netdev_budget_usecs = 5000
@@ -292,18 +292,18 @@ net.ipv4.ip_forward=0
 EOF
 
         # Disk
-        cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/60-disk.conf" <<EOF
 vm.dirty_background_bytes = 4194304
 vm.dirty_bytes = 4194304
 EOF
 
         # Kernel
-        cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/70-kernel.conf" <<EOF
 kernel.dmesg_restrict = 1
 EOF
 
         # Swappiness
-        cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/80-swappiness.conf" <<EOF
 vm.swappiness=1
 vm.vfs_cache_pressure=50
 EOF
