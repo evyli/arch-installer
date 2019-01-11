@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+# Copyright (C) 2017  nyshria <nyshria@member.fsf.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ Commands:
     umount
     help
 
-Copyright (C) 2017  nytthea <nytthea@member.fsf.org>
+Copyright (C) 2017  nyshria <nyshria@member.fsf.org>
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.

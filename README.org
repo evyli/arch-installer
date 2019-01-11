@@ -1,20 +1,19 @@
-#+TITLE: arch-installer
+#+TITLE: ArchLinux installer (unofficial)
 #+LANGUAGE: en
 
-This repository is a minimal version of my *ArchLinux* installer by just configuring
-the encrypted partitions and configure *Arch* to boot those.
+This repository contains my *ArchLinux* installer which considers some security aspects and provides full encrypted disks.
 
 * Preparations
 
 1. Increase the cowspace size on the livedisk: ~mount -o size=1G,remount /run/archiso/cowspace~
 2. Install required packages: ~pacman -Sy && pacman -S pacman-contrib git make m4~
-3. Pull the repository: ~git clone https://github.com/nytthea/arch-installer.git~
+3. Pull the repository: ~git clone https://github.com/nyshria/arch-installer.git~
 4. Run ~make~ inside the repository
 
 * Install
 
 1. Call the installer with no arguments or with the argument ~help~ to see the supported commands.
-2. Generally you should do:
+2. Run the commands:
       1. Modify the provided configuration file
       2. > ~livedisk-init~ (optional)
       3. > ~disk-partition~
@@ -26,7 +25,7 @@ the encrypted partitions and configure *Arch* to boot those.
       8. Reboot into the new system
 
 * License
-Copyright (C)  2017 nytthea
+Copyright (C)  2017 nyshria
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
