@@ -103,10 +103,15 @@ EOF
             fi
 
             # Try to use the hardcoded keyfile before asking for passphrase
-            if eval cryptsetup --key-file "/root/root.key" open --type luks ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; then
-                dopassphrase=0
+            if [ -f "/root/root.key" ]; then
+                if eval cryptsetup --key-file "/root/root.key" open --type luks ${resolved} ${cryptname} ${cryptargs} ${CSQUIET}; then
+                    echo "Unlocked root with installed keyfile."
+                    dopassphrase=0
+                else
+                    echo "Invalid keyfile. Reverting to passphrase."
+                fi
             else
-                echo "Invalid keyfile or keyfile not found. Reverting to passphrase."
+                echo "Keyfile not found. Reverting to passphrase."
             fi
 
             # Ask for a passphrase
