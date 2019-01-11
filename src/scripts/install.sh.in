@@ -257,8 +257,6 @@ EOF
 
         # Network tuning
         cat >> "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf" <<EOF
-net.core.bpf_jit_enable = 0
-
 net.core.netdev_max_backlog = 100000
 net.core.netdev_budget = 50000
 net.core.netdev_budget_usecs = 5000
