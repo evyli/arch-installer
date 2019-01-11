@@ -73,7 +73,7 @@ cmd-install() {
     write-encrypt-install
 
     state "Configure mkinitcpio hooks"
-    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont ${encrypt_hook_name} lvm2 resume filesystems fsck\""
+    target-config-set-entry "/etc/mkinitcpio.conf" "HOOKS" "\"base udev modconf block keyboard keymap consolefont ${encrypt_hook_name} lvm2 resume filesystems\""
 
     state "Create /root/.luks folder"
     mkdir -p "$TARGET_DIR/root/.luks"
@@ -117,7 +117,7 @@ cmd-install() {
     state "Configure grub"
     local quiet_cmdline
     if (( QUIET_BOOT )); then
-        quiet_cmdline="quiet "
+        quiet_cmdline="quiet loglevel=3 vga=current udev.log_priority=3"
     else
         quiet_cmdline=""
     fi
@@ -129,7 +129,7 @@ cmd-install() {
     target-config-set-entry "/etc/default/grub" "GRUB_ENABLE_CRYPTODISK" y
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT_QUIET" "true"
     target-config-set-entry "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" 1
-    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[0]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT\""
+    target-config-set-entry "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT" "\"${quiet_cmdline}cryptdevice=/dev/disk/by-partuuid/$mainpartition_partuuid:archlinux root=/dev/mapper/archlinux-root rw lang=en locale=$(echo "${LOCALES[0]}" | cut -f 1 -d ' ') resume=/dev/mapper/archlinux-swap rootflags=subvol=/btrfs/current/ROOT fsck.mode=skip\""
 
     state "Generate grub configuration"
     mkdir -p "$TARGET_DIR/boot/grub"
