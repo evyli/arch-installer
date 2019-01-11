@@ -172,7 +172,7 @@ EOF
     fi
 
     state "Create user account"
-    target-exec useradd -m -G "users,$USERGROUPS" "$USER"
+    target-exec useradd -m -G "users,wheel" "$USER"
     while ! target-exec passwd "$USER"; do
         sleep 1
     done
@@ -212,7 +212,7 @@ EOF
     if (( CONFIGURE_SYSTEMD_TIMESYNCD )); then
         state "Setup timesync"
         target-enable systemd-timesyncd.service
-        target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
+        target-config-set-entry "/etc/systemd/timesyncd.conf" "NTP" "$NTP_SERVERS"
     fi
 
     if (( CONFIGURE_SENSORS )); then

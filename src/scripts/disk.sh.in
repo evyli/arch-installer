@@ -16,6 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Partition numbers assumed during disk partitioning
+export BOOT_PARTITION=1
+export MAIN_PARTITION=5
+
 cmd-disk-partition() {
     local force=0
     if [[ "${1:-}" = "--force" ]]; then
