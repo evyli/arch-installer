@@ -112,6 +112,7 @@ cmd-install() {
 
     state "Build kernel image"
     target-exec mkinitcpio -p linux
+    target-exec mkinitcpio -p linux-hardened
 
     state "Configure grub"
     local quiet_cmdline
