@@ -160,8 +160,8 @@ EOF
 
 
     if [[ "$ETH_INTERFACE" = "auto" ]]; then
-        ETH_INTERFACE="$(ls /sys/class/net | grep '^e' | tr '\n' ' ' | cut -f 1 -d ' ')"
-        ETH_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$ETH_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=')"
+        ETH_INTERFACE="$(ls /sys/class/net | grep '^e' | tr '\n' ' ' | cut -f 1 -d ' ' || true)"
+        ETH_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$ETH_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=' || true)"
     fi
 
     if [[ "$ETH_INTERFACE" != "" ]]; then
@@ -172,8 +172,8 @@ EOF
     fi
 
     if [[ "$WIFI_INTERFACE" = "auto" ]]; then
-        WIFI_INTERFACE="$(ls /sys/class/net | grep '^w' | tr '\n' ' ' | cut -f 1 -d ' ')"
-        WIFI_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$WIFI_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=')"
+        WIFI_INTERFACE="$(ls /sys/class/net | grep '^w' | tr '\n' ' ' | cut -f 1 -d ' ' || true)"
+        WIFI_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$WIFI_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=' || true)"
     fi
 
     if [[ "$WIFI_INTERFACE" != "" ]]; then
