@@ -420,9 +420,6 @@ kernel.dmesg_restrict = 1
 # Seconds to delay after a kernel panic and before rebooting automatically
 kernel.panic = 300
 
-# Disable system request debugging
-kernel.sysrq = 0
-
 # Core dump filenames contain PIDs
 kernel.core_uses_pid = 1
 
