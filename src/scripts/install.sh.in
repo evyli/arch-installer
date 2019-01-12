@@ -404,6 +404,9 @@ kernel.pid_max = 65536
 
 # ASLR
 kernel.randomize_va_space=2
+
+# KPTR
+kernel.kptr_restrict=2
 EOF
 
         # Swappiness
@@ -453,9 +456,16 @@ EOF
         echo "PermitRootLogin no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "PasswordAuthentication no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "AllowUsers $USER" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "Protocol 2" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "Compression no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "LoginGraceTime 60" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "LogLevel verbose" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "MaxAuthTries 2" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "MaxStartups 8" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "MaxSessions 2" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "AllowTcpForwarding no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "AllowAgentForwarding no" >> "$TARGET_DIR/etc/ssh/sshd_config"
+        echo "TCPKeepAlive no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "PermitEmptyPasswords no" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "ClientAliveInterval 300" >> "$TARGET_DIR/etc/ssh/sshd_config"
         echo "ClientAliveCountMax 0" >> "$TARGET_DIR/etc/ssh/sshd_config"
@@ -476,6 +486,12 @@ EOF
         target-exec systemctl mask NetworkManager.service
 
         target-config-set-entry "/etc/default/tlp" "SATA_LINKPWR_ON_BAT" "max_performance"
+    fi
+
+    if (( CONFIGURE_MALWARE_SCANNER )); then
+        state "Configure malware scanner"
+        target-install rkhunter
+        target-exec rkhunter --update --propupd
     fi
 
     if (( CONFIGURE_MLOCATE )); then
