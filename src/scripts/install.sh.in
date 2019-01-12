@@ -402,8 +402,7 @@ kernel.core_uses_pid = 1
 # Allow more PIDs
 kernel.pid_max = 65536
 
-# Hardening settings
-kernel.exec-shield=1
+# ASLR
 kernel.randomize_va_space=2
 EOF
 
