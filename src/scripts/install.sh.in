@@ -493,12 +493,6 @@ EOF
         target-config-set-entry "/etc/default/tlp" "SATA_LINKPWR_ON_BAT" "max_performance"
     fi
 
-    if (( CONFIGURE_MALWARE_SCANNER )); then
-        state "Configure malware scanner"
-        target-install rkhunter
-        target-exec rkhunter --update --propupd
-    fi
-
     if (( CONFIGURE_MLOCATE )); then
         state "Configure mlocate"
         target-install mlocate
