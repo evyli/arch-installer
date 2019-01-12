@@ -24,6 +24,11 @@ cmd-install() {
     state "Update packages"
     pacman -Sy
 
+    if [ -n "$INSTALL_PACKAGES" ]; then
+        state "Install packages (if config was updated)"
+        target-install "${INSTALL_PACKAGES[@]}"
+    fi
+
     state "Update pacman file database"
     target-exec pacman -Fy
 
