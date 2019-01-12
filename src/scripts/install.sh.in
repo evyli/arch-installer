@@ -181,6 +181,16 @@ EOF
         target-enable "netctl-auto@$WIFI_INTERFACE.service"
     fi
 
+    state "Configure hidepid"
+    mkdir -p "$TARGET_DIR/etc/systemd/system/systemd-logind.service.d"
+    cat > "$TARGET_DIR/etc/systemd/system/systemd-logind.service.d/hidepid.conf" <<EOF
+[Service]
+SupplementaryGroups=proc
+EOF
+    cat >> "$TARGET_DIR/etc/fstab" <<EOF
+proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
+EOF
+
     state "Create user account"
     target-exec useradd -U -m -G "users,wheel" "$USER"
     while ! target-exec passwd "$USER"; do
