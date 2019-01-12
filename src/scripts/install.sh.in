@@ -158,12 +158,24 @@ EOF
     cryptsetup luksHeaderBackup "${DEVICE}$MAIN_PARTITION" --header-backup-file "$TARGET_DIR/root/.luks/root.luksheader"
     cryptsetup luksHeaderBackup "${DEVICE}$BOOT_PARTITION" --header-backup-file "$TARGET_DIR/root/.luks/boot.luksheader"
 
+
+    if [[ "$ETH_INTERFACE" = "auto" ]]; then
+        ETH_INTERFACE="$(ls /sys/class/net | grep '^e' | tr '\n' ' ' | cut -f 1 -d ' ')"
+        ETH_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$ETH_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=')"
+    fi
+
     if [[ "$ETH_INTERFACE" != "" ]]; then
         state "Setup ifplugd Ethernet"
         target-enable "netctl-ifplugd@$ETH_INTERFACE.service"
         cp "$TARGET_DIR/etc/netctl/examples/ethernet-dhcp" "$TARGET_DIR/etc/netctl/eth"
         sed -i "s/eth0/$ETH_INTERFACE/g" "$TARGET_DIR/etc/netctl/eth"
     fi
+
+    if [[ "$WIFI_INTERFACE" = "auto" ]]; then
+        WIFI_INTERFACE="$(ls /sys/class/net | grep '^w' | tr '\n' ' ' | cut -f 1 -d ' ')"
+        WIFI_INTERFACE="$(udevadm test-builtin net_id "/sys/class/net/$WIFI_INTERFACE" 2>/dev/null | grep '^ID_NET_NAME_PATH' | cut -f 2 -d '=')"
+    fi
+
     if [[ "$WIFI_INTERFACE" != "" ]]; then
         state "Setup auto Wifi"
         target-enable "netctl-auto@$WIFI_INTERFACE.service"
