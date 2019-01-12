@@ -357,6 +357,20 @@ EOF
         chmod 600 "$TARGET_DIR/etc/ssh/sshd_config"
     fi
 
+    if (( CONFIGURE_POWER_SAVING )); then
+        state "Configure power saving"
+        target-install tlp
+        if (( IS_THINKPAD )); then
+            target-install tp_smapi acpi_call
+        fi
+        target-enable tlp tlp-sleep
+        target-exec systemctl mask systemd-rfkill.service
+        target-exec systemctl mask systemd-rfkill.socket
+        target-exec systemctl mask NetworkManager.service
+
+        target-config-set-entry "/etc/default/tlp" "SATA_LINKPWR_ON_BAT" "max_performance"
+    fi
+
     if (( CONFIGURE_MLOCATE )); then
         state "Configure mlocate"
         target-install mlocate
