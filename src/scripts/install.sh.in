@@ -380,7 +380,7 @@ EOF
 # Increase size of file handles and inode cache 
 fs.file-max = 2097152
 
-# Protect agains creation or following links in certain conditions
+# Protect against creation or following links in certain conditions
 fs.protected_hardlinks=1
 fs.protected_symlinks=1
 EOF
