@@ -105,12 +105,18 @@ EOF
     done
     sync
 
+    state "Determine swap space"
+    local memtotal
+    memtotal="$(grep MemTotal /proc/meminfo | awk '{print $2}')"
+    local swap_size
+    swap_size="$(echo "$memtotal * $SWAP_SIZE_FACTOR" | bc)kB"
+
     category "Creating LVM volumes"
     while ! eval pvcreate -ff "/dev/mapper/ARCH"; do
         sleep 1
     done
     vgcreate archlinux "/dev/mapper/ARCH"
-    lvcreate -L "$SWAP_SIZE" archlinux -n swap
+    lvcreate -L "$swap_size" archlinux -n swap
     lvcreate -l +100%FREE archlinux -n root
     sleep 2
 
