@@ -165,7 +165,7 @@ EOF
     fi
 
     state "Create user account"
-    target-exec useradd -g -m -G "users,wheel" "$USER"
+    target-exec useradd -U -m -G "users,wheel" "$USER"
     while ! target-exec passwd "$USER"; do
         sleep 1
     done
