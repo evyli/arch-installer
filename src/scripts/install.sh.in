@@ -240,45 +240,86 @@ EOF
 
     if (( CONFIGURE_SYSCTL )); then
         state "Configure sysctl"
-        echo "" > "$TARGET_DIR/etc/sysctl.d/99-sysctl.conf"
-
         # Network tuning
-        cat >> "$TARGET_DIR/etc/sysctl.d/50-network.conf" <<EOF
-net.core.netdev_max_backlog = 100000
-net.core.netdev_budget = 50000
-net.core.netdev_budget_usecs = 5000
-
+        cat >> "$TARGET_DIR/etc/sysctl.d/30-network.conf" <<EOF
+# Number of incoming connection sockets per listen call
 net.core.somaxconn = 1024
 
-net.core.rmem_default = 1048576
-net.core.rmem_max = 16777216
-net.core.wmem_default = 1048576
-net.core.wmem_max = 16777216
-net.core.optmem_max = 65536
-net.ipv4.tcp_rmem = 4096 1048576 2097152
-net.ipv4.tcp_wmem = 4096 65536 16777216
+# Number of incoming connections (packets) in backlog queue
+net.core.netdev_max_backlog = 100000
 
-net.ipv4.udp_rmem_min = 8192
-net.ipv4.udp_wmem_min = 8192
+# Socket receive buffer
+net.core.rmem_default = 25165824
+net.core.rmem_max = 25165824
 
-net.ipv4.tcp_fastopen = 3
+# Socket send buffer
+net.core.wmem_default = 25165824
+net.core.wmem_max = 25165824
+
+# Option memory buffers
+net.core.optmem_max = 25165824
+
+# Read buffer (minimum, initial, maximum)
+net.ipv4.tcp_rmem = 20480 12582912 25165824
+net.ipv4.udp_rmem_min = 16384 # Default
+
+# Send buffer (minimum, initial, maximum)
+net.ipv4.tcp_wmem = 20480 12582912 25165824
+net.ipv4.udp_wmem_min = 16384 # Default
+
+# Number of remembered connection requests without an acknowledgment
 net.ipv4.tcp_max_syn_backlog = 30000
+
+# Increase tcp time wait pool as DOS protection
 net.ipv4.tcp_max_tw_buckets = 2000000
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_fin_timeout = 10
-net.ipv4.tcp_slow_start_after_idle = 0
 
-net.ipv4.tcp_keepalive_time = 60
-net.ipv4.tcp_keepalive_intvl = 10
-net.ipv4.tcp_keepalive_probes = 6
-
+# Use MTU discovery when ICMP black hole detected
 net.ipv4.tcp_mtu_probing = 1
 
+# Reuse of TIME-WAIT sockets for loopback traffic only
+net.ipv4.tcp_tw_reuse = 2
+
+# Client and server support for TCP Fast Open to send and accept data in the
+# opening SYN packet
+net.ipv4.tcp_fastopen = 3
+
+# Decrease time for tcp_fin_timeout connection
+net.ipv4.tcp_fin_timeout = 10
+
+# Do not time out the congestion window after an idle period
+net.ipv4.tcp_slow_start_after_idle = 0
+
+# Turn on window scaling which can enlarge the transfer window
+net.ipv4.tcp_window_scaling = 1
+
+# Keepalive configuration
+net.ipv4.tcp_keepalive_time = 60
+net.ipv4.tcp_keepalive_intvl = 10
+net.ipv4.tcp_keepalive_probes = 5
+
+# Prevention against SYN flood attack
 net.ipv4.tcp_syncookies = 1
 
+# Enable timestamps as defined in RFC1323
+net.ipv4.tcp_timestamps = 1
+
+# Strict mode validation of source
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.rp_filter = 1
 
+# Enable select acknowledgments
+net.ipv4.tcp_sack = 1
+
+# Number of TCP sockets that are not attached to any user file handle to maintain.
+net.ipv4.tcp_max_orphans = 60000
+
+# Number of times SYNACKs for passive TCP connection.
+net.ipv4.tcp_synack_retries = 2 
+
+# Protect Against TCP Time-Wait 
+net.ipv4.tcp_rfc1337 = 1
+
+# ICMP configuration
 net.ipv4.conf.all.accept_redirects = 0
 net.ipv4.conf.default.accept_redirects = 0
 net.ipv4.conf.all.secure_redirects = 0
@@ -287,26 +328,93 @@ net.ipv6.conf.all.accept_redirects = 0
 net.ipv6.conf.default.accept_redirects = 0
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.default.send_redirects = 0
+
+# Ignore all ICMP ECHO and TIMESTAMP requests sent via broadcast/multicast
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Ignore bogus errors (violation of RFC1122) and do not log them.
 net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+# Disable ip forwarding
 net.ipv4.ip_forward=0
+
+# Do not accept source routing
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.all.accept_source_route = 0
+
+# Number of Router Solicitations to send until assuming that no routers are present.
+net.ipv6.conf.default.router_solicitations = 0
+
+# Accept Router Preference
+net.ipv6.conf.default.accept_ra_rtr_pref = 0
+
+# Learn Prefix Information in Router Advertisement
+net.ipv6.conf.default.accept_ra_pinfo = 0
+
+# Setting controls whether the system will accept Hop Limit settings from a router advertisement
+net.ipv6.conf.default.accept_ra_defrtr = 0
+
+# Router advertisements can cause the system to assign a global unicast address to an interface
+net.ipv6.conf.default.autoconf = 0
+
+# How many neighbor solicitations to send out per address?
+net.ipv6.conf.default.dad_transmits = 0
+
+# How many global unicast IPv6 addresses can be assigned to each interface?
+net.ipv6.conf.default.max_addresses = 1
 EOF
 
-        # Disk
-        cat >> "$TARGET_DIR/etc/sysctl.d/60-disk.conf" <<EOF
-vm.dirty_background_bytes = 4194304
-vm.dirty_bytes = 4194304
+        # VM
+        cat >> "$TARGET_DIR/etc/sysctl.d/30-vm.conf" <<EOF
+# Configure dirty memory settings and when to flush
+vm.dirty_background_ratio = 1
+vm.dirty_background_bytes = 0
+vm.dirty_ratio = 90
+vm.dirty_bytes = 0
+vm.dirty_writeback_centisecs = 100
+vm.dirty_expire_centisecs = 1000
+EOF
+
+        # FS
+        cat >> "$TARGET_DIR/etc/sysctl.d/30-fs.conf" <<EOF
+# Increase size of file handles and inode cache 
+fs.file-max = 2097152
+
+# Protect agains creation or following links in certain conditions
+fs.protected_hardlinks=1
+fs.protected_symlinks=1
 EOF
 
         # Kernel
-        cat >> "$TARGET_DIR/etc/sysctl.d/70-kernel.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/30-kernel.conf" <<EOF
+# Restrict access to kernel log
 kernel.dmesg_restrict = 1
+
+# Seconds to delay after a kernel panic and before rebooting automatically
+kernel.panic = 300
+
+# Disable system request debugging
+kernel.sysrq = 0
+
+# Core dump filenames contain PIDs
+kernel.core_uses_pid = 1
+
+# Allow more PIDs
+kernel.pid_max = 65536
+
+# Hardening settings
+kernel.exec-shield=1
+kernel.randomize_va_space=2
 EOF
 
         # Swappiness
-        cat >> "$TARGET_DIR/etc/sysctl.d/80-swappiness.conf" <<EOF
+        cat >> "$TARGET_DIR/etc/sysctl.d/60-swappiness.conf" <<EOF
+# Reduce usage of swap
 vm.swappiness=1
 vm.vfs_cache_pressure=50
 EOF
+
+        touch "$TARGET_DIR/etc/sysctl.d/99-overwrites.conf"
     fi
 
     if (( CONFIGURE_DNSCACHE )); then
