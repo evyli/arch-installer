@@ -117,7 +117,7 @@ cmd-install() {
     state "Configure grub"
     local quiet_cmdline
     if (( QUIET_BOOT )); then
-        quiet_cmdline="quiet loglevel=3 vga=current udev.log_priority=3 "
+        quiet_cmdline="quiet loglevel=3 udev.log_priority=3 "
     else
         quiet_cmdline=""
     fi
