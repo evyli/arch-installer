@@ -413,7 +413,7 @@ EOF
         cat >> "$TARGET_DIR/etc/sysctl.d/60-swappiness.conf" <<EOF
 # Reduce usage of swap
 vm.swappiness=1
-vm.vfs_cache_pressure=50
+vm.vfs_cache_pressure=150
 EOF
 
         touch "$TARGET_DIR/etc/sysctl.d/99-overwrites.conf"
