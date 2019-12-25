@@ -34,7 +34,7 @@ Run the commands:
 4. > ~umount~
 
 * License
-Copyright (C)  2017 nyshria
+Copyright (C)  2020 Leah Lackner
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

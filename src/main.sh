@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2017  nyshria <nyshria@member.fsf.org>
+# Copyright (C) 2020 Leah Lackner <evyli@mailbox.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ usage: $0 <cmd>
 Preparations:
   1. Increase the cowspace size on the livedisk: 'mount -o size=1G,remount /run/archiso/cowspace'
   2. Install required packages: 'pacman -Sy && pacman -S pacman-contrib git make m4'
-  3. Pull the repository: 'git clone https://github.com/nyshria/arch-installer.git'
+  3. Pull the repository: 'git clone https://github.com/evyli/arch-installer.git'
   4. Run 'make' inside the repository
 
 Install:
@@ -47,7 +47,7 @@ Inspect the system later:
     3. > 'chroot'
     4. > 'umount'
 
-Copyright (C) 2017  nyshria <nyshria@member.fsf.org>
+Copyright (C) 2020 Leah Lackner <evyli@mailbox.org>
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.
