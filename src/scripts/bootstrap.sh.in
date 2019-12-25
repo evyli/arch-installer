@@ -28,7 +28,7 @@ cmd-bootstrap() {
     local base_packages=( # base
                           base base-devel
                           # kernel
-                          linux-zen
+                          linux
                           # maintenance
                           polkit
                           # boot utils
