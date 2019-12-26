@@ -1,0 +1,163 @@
+# Arch-installer
+#
+#########################################################################
+echo "Please edit the configuration first and remove this line afterwards." && exit 1
+#########################################################################
+
+# The device to install ArchLinux to.
+export DEVICE="/dev/sda"
+
+# Whether the device is a thinkpad laptop or a VM
+export IS_THINKPAD=0
+
+# The hostname of the machine.
+export HOSTNAME="archlinux"
+
+# Wipes the hard disk securely. Use with caution, especiall on SSDs. Probably
+# better do not use it at all if the disk were already encrypted beforehand.
+export WIPE_SECURE=0
+
+# Due to swappiness settings, swap is almost only used for hibernation. The
+# factor is multiplied with the available memory.
+export SWAP_SIZE_FACTOR=1.0
+
+# Name of the user to be created.
+export USER="user"
+
+# Leave empty to disable auto login or specify the tty to login into.
+export AUTOLOGIN="tty1"
+
+# Locale and font settings
+export LOCALES=("en_GB.UTF-8 UTF-8" "de_DE.UTF-8 UTF-8" "en_US.UTF-8 UTF-8")
+export KEYMAP="uk"
+export FONT="Lat2-Terminus16"
+export ZONE="Europe/Berlin"
+
+# Unlock the root partition with a generated keyfile. If this option is enabled
+# only one passphrase has to be entered to boot the machine (to unlock grub on
+# /boot).
+export ENCRYPT_ROOT_WITH_KEYFILE=1
+
+# Disable systemd's ctrl-alt-del reboot key combination.
+export DISABLE_REBOOT_KEY=1
+
+# Clears tty1 after booting and start the kernel quiet if no errors occur during
+# booting.
+export CLEAR_TTY1=1
+export QUIET_BOOT=1
+
+# Enter the names of your network interfaces to setup netctl.
+# If 'auto' is used, the installer tries to find out the names via udevadm
+# automatically.
+export ETH_INTERFACE="auto"
+export WIFI_INTERFACE="auto"
+
+# Options forwarded to cryptsetup
+export MAIN_ENCRYPTION_OPTIONS=("--iter-time=1")
+export BOOT_ENCRYPTION_OPTIONS=("--iter-time=1")
+
+# Optional features to enable/disable
+export CONFIGURE_POWER_SAVING=1
+export CONFIGURE_SSH=1
+export CONFIGURE_FIREWALL=1
+export CONFIGURE_SENSORS=1
+export CONFIGURE_ETCKEEPER=1
+export CONFIGURE_SYSTEMD_TIMESYNCD=1
+export CONFIGURE_MLOCATE=1
+export CONFIGURE_PKGFILE=1
+export CONFIGURE_IRQBALANCE=1
+export CONFIGURE_DNSCACHE=1
+export CONFIGURE_SYSCTL=1
+
+# Only configured when using DNSCACHE
+export DNS_SERVER1=1.1.1.1
+export DNS_SERVER2=1.0.0.1
+export DNS_SERVER3=
+
+# Only configured when using SSH
+export SSHD_PORT=2222
+
+# Only configured when using SYSTEMD_TIMESYNCD
+export NTP_SERVERS="0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
+
+#########################################################################
+# Additional non-essential packages to be installed during bootstrapping.
+#########################################################################
+export INSTALL_PACKAGES=(
+    # system
+    bc
+    colordiff
+    time
+    rng-tools
+    lsb-release
+    sysstat
+    htop
+    most
+    powertop
+    jnettop
+    iotop
+    sdparm
+    hwinfo
+    hdparm
+
+    # web
+    w3m
+    links
+
+    # chat
+    irssi
+
+    # pastebin client
+    gist
+
+    # filesystem
+    encfs
+    smbclient
+    unionfs-fuse
+    exfat-utils
+    lsof
+    parted
+    gptfdisk
+    udevil
+    mtpfs
+
+    # archives
+    cpio
+    zip
+    lrzip
+
+    # shell
+    bash-completion
+    screen
+    tmux
+
+    # editors
+    vim
+    emacs-nox
+
+    # file transfer and vcs
+    rsync
+    git
+
+    # network
+    ethtool
+    net-tools
+    ldns
+    bind-tools
+    whois
+    nmap
+    traceroute
+    iproute2
+    bridge-utils
+    openvpn
+    openconnect
+    vpnc
+    openssh
+    sshfs
+    openbsd-netcat
+
+    # audits
+    lynis
+    arch-audit
+    rkhunter
+)
