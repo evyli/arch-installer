@@ -54,7 +54,7 @@ cmd-start-iso() {
         echo "First download an archlinux iso and place the file here: 'archlinux.iso'"
         exit 1
     fi
-    qemu-system-x86_64 -m 4G -hda archlinux.img -cdrom archlinux.iso -boot d 
+    qemu-system-x86_64 -smp 2 -m 4G -hda archlinux.img -cdrom archlinux.iso -boot d 
 }
 
 cmd-boot() {
@@ -62,7 +62,7 @@ cmd-boot() {
         echo "First run '$0 init'"
         exit 1
     fi
-    qemu-system-x86_64 -m 4G -hda archlinux.img
+    qemu-system-x86_64 -smp 2 -m 4G -hda archlinux.img
 }
 
 cmd="${1:-}"
