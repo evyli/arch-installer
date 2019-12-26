@@ -1,9 +1,5 @@
 # Arch-installer
 #
-#########################################################################
-echo "Please edit the configuration first and remove this line afterwards." && exit 1
-#########################################################################
-
 # The device to install ArchLinux to.
 export DEVICE="/dev/sda"
 
