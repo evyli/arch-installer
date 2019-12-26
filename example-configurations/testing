@@ -151,9 +151,4 @@ export INSTALL_PACKAGES=(
     openssh
     sshfs
     openbsd-netcat
-
-    # audits
-    lynis
-    arch-audit
-    rkhunter
 )
