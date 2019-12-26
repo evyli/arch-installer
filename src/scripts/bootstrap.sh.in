@@ -32,9 +32,9 @@ cmd-bootstrap() {
                           # maintenance
                           polkit
                           # boot utils
-                          btrfs-progs grub
+                          lvm2 btrfs-progs grub
                           # network dependencies
-                          iw wpa_supplicant dialog wpa_actiond ifplugd
+                          iw wpa_supplicant dialog ifplugd
                           # pacman utils
                           pacman-contrib pacman-mirrorlist)
     pacstrap "$TARGET_DIR" "${base_packages[@]}"
